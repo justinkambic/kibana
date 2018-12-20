@@ -1,4 +1,4 @@
-<kbn-top-nav class="navbar navbar-default navbar-static-top" name="account-nav" ng-if="!k7design">
+<kbn-top-nav class="navbar navbar-default navbar-static-top" name="account-nav">
   <!-- Transcluded elements. -->
   <div data-transclude-slots>
     <!-- Title. -->
@@ -35,7 +35,7 @@
       i18n-default-message="Username"
     ></label>
     <div class="euiText">
-      <p ng-bind="::user.username" data-test-subj=usernameField></p>
+      <p ng-bind="::user.username"></p>
     </div>
   </div>
 
@@ -47,7 +47,7 @@
       i18n-default-message="Email"  
     ></label>
     <div class="euiText">
-      <p ng-bind="::accountController.getEmail()" data-test-subj=emailIdField></p>
+      <p ng-bind="::accountController.getEmail()"></p>
     </div>
   </div>
 

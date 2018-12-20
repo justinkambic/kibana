@@ -8,5 +8,7 @@
   pipeline-hash="{{ pageData.pipeline.hash }}"
   pipeline-versions="pageData.versions"
 >
-  <div id="monitoringLogstashPipelineApp"></div>
+  <div class="page-row">
+    <monitoring-logstash-pipeline-viewer pipeline="pageData.pipeline"></monitoring-logstash-pipeline-viewer>
+  </div>
 </monitoring-main>

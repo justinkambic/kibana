@@ -1,7 +1,7 @@
 {
   "author": "Elastic",
   "name": "infra",
-  "version": "7.0.0",
+  "version": "7.0.0-alpha1",
   "private": true,
   "license": "Elastic-License",
   "scripts": {

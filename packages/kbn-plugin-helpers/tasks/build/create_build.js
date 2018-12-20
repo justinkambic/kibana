@@ -82,19 +82,17 @@ module.exports = function createBuild(plugin, buildTarget, buildVersion, kibanaV
           .pipe(rewritePackageJson(buildSource, buildVersion, kibanaVersion))
 
           // put all files inside the correct directories
-          .pipe(
-            rename(function nestFileInDir(filePath) {
-              const nonRelativeDirname = filePath.dirname.replace(/^(\.\.\/?)+/g, '');
-              filePath.dirname = path.join(relative(buildTarget, buildRoot), nonRelativeDirname);
-            })
-          )
+          .pipe(rename(function nestFileInDir(filePath) {
+            const nonRelativeDirname = filePath.dirname.replace(/^(\.\.\/?)+/g, '');
+            filePath.dirname = path.join(relative(buildTarget, buildRoot), nonRelativeDirname);
+          }))
 
           .pipe(vfs.dest(buildTarget))
           .on('end', resolve)
           .on('error', reject);
       });
     })
-    .then(function() {
+    .then(function () {
       if (plugin.skipInstallDependencies) {
         return;
       }
@@ -104,7 +102,7 @@ module.exports = function createBuild(plugin, buildTarget, buildVersion, kibanaV
         cwd: buildRoot,
       });
     })
-    .then(function() {
+    .then(function () {
       if (!plugin.styleSheetToCompile) {
         return;
       }
@@ -122,7 +120,7 @@ module.exports = function createBuild(plugin, buildTarget, buildVersion, kibanaV
 
       del.sync([path.join(buildRoot, '**', '*.s{a,c}ss')]);
     })
-    .then(function() {
+    .then(function () {
       const buildConfigPath = path.join(buildRoot, 'tsconfig.json');
 
       if (!existsSync(buildConfigPath)) {
@@ -155,16 +153,11 @@ module.exports = function createBuild(plugin, buildTarget, buildVersion, kibanaV
         path.join(buildRoot, 'tsconfig.json'),
       ]);
     })
-    .then(function() {
+    .then(function () {
       const buildFiles = [relative(buildTarget, buildRoot) + '/**/*'];
 
       return new Promise((resolve, reject) => {
-        vfs
-          .src(buildFiles, {
-            cwd: buildTarget,
-            base: buildTarget,
-            resolveSymlinks: false,
-          })
+        vfs.src(buildFiles, { cwd: buildTarget, base: buildTarget, resolveSymlinks: false })
           .pipe(removeSymlinkDependencies(buildRoot))
           .on('finish', resolve)
           .on('error', reject);

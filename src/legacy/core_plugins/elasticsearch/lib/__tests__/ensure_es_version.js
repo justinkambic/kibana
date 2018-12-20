@@ -42,11 +42,6 @@ describe('plugins/elasticsearch', () => {
             },
             url: esTestConfig.getUrl()
           }
-        },
-        config() {
-          return {
-            get: sinon.stub()
-          };
         }
       };
     });

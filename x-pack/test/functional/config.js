@@ -17,9 +17,7 @@ import {
   WatcherPageProvider,
   ReportingPageProvider,
   SpaceSelectorPageProvider,
-  AccountSettingProvider,
   InfraHomePageProvider,
-  GisPageProvider,
   StatusPagePageProvider,
   UpgradeAssistantProvider,
 } from './page_objects';
@@ -79,7 +77,6 @@ export default async function ({ readConfigFile }) {
       resolve(__dirname, './apps/logstash'),
       resolve(__dirname, './apps/grok_debugger'),
       resolve(__dirname, './apps/infra'),
-      resolve(__dirname, './apps/gis'),
       resolve(__dirname, './apps/status_page'),
       resolve(__dirname, './apps/upgrade_assistant'),
     ],
@@ -123,7 +120,6 @@ export default async function ({ readConfigFile }) {
     pageObjects: {
       ...kibanaFunctionalConfig.get('pageObjects'),
       security: SecurityPageProvider,
-      accountSetting: AccountSettingProvider,
       monitoring: MonitoringPageProvider,
       logstash: LogstashPageProvider,
       graph: GraphPageProvider,
@@ -132,7 +128,6 @@ export default async function ({ readConfigFile }) {
       reporting: ReportingPageProvider,
       spaceSelector: SpaceSelectorPageProvider,
       infraHome: InfraHomePageProvider,
-      gis: GisPageProvider,
       statusPage: StatusPagePageProvider,
       upgradeAssistant: UpgradeAssistantProvider,
     },
@@ -175,9 +170,6 @@ export default async function ({ readConfigFile }) {
       logstashPipelines: {
         pathname: '/app/kibana',
         hash: '/management/logstash/pipelines',
-      },
-      gis: {
-        pathname: '/app/gis',
       },
       graph: {
         pathname: '/app/graph',

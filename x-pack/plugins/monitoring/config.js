@@ -57,6 +57,7 @@ export const config = (Joi) => {
     min_interval_seconds: Joi.number().default(10),
     show_license_expiration: Joi.boolean().default(true),
     report_stats: Joi.boolean().default(true),
+    node_resolver: Joi.string().valid('uuid').default('uuid'), // deprecated in 5.6; we can make them set it properly before we remove it
     agent: Joi.object({
       interval: Joi.string().regex(/[\d\.]+[yMwdhms]/).default('10s')
     }).default(),

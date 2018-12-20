@@ -17,9 +17,10 @@
  * under the License.
  */
 
+import { jstz as tzDetect } from 'jstimezonedetect';
 import _ from 'lodash';
 import chrome from '../../chrome';
-import moment from 'moment-timezone';
+import moment from 'moment';
 import '../../filters/field_type';
 import '../../validate_date_interval';
 import { BucketAggType } from './_bucket_agg_type';
@@ -32,7 +33,7 @@ import dropPartialTemplate from '../controls/drop_partials.html';
 import { i18n } from '@kbn/i18n';
 
 const config = chrome.getUiSettingsClient();
-const detectedTimezone = moment.tz.guess();
+const detectedTimezone = tzDetect.determine().name();
 const tzOffset = moment().format('Z');
 
 function getInterval(agg) {

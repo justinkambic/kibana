@@ -10,27 +10,24 @@ import routes from 'ui/routes';
 import template from './account.html';
 import '../management/change_password_form/change_password_form';
 import '../../services/shield_user';
-import { i18n } from '@kbn/i18n';
+import { GateKeeperProvider } from 'plugins/xpack_main/services/gate_keeper';
 import { REALMS_ELIGIBLE_FOR_PASSWORD_CHANGE } from '../../../common/constants';
 
 routes.when('/account', {
   template,
-  k7Breadcrumbs: () => [
-    {
-      text: i18n.translate('xpack.security.account.breadcrumb', {
-        defaultMessage: 'Account',
-      })
-    }
-  ],
   resolve: {
+    tribeRedirect(Private) {
+      const gateKeeper = Private(GateKeeperProvider);
+      gateKeeper.redirectAndNotifyIfTribe();
+    },
+
     user(ShieldUser) {
       return ShieldUser.getCurrent().$promise;
     }
   },
   controllerAs: 'accountController',
-  controller($scope, $route, Notifier, config, i18n) {
+  controller($scope, $route, Notifier, i18n) {
     $scope.user = $route.current.locals.user;
-    config.bindToScope($scope, 'k7design');
 
     const notifier = new Notifier();
 
@@ -49,7 +46,6 @@ routes.when('/account', {
           title: i18n('xpack.security.account.updatedPasswordTitle', {
             defaultMessage: 'Updated password'
           }),
-          'data-test-subj': 'passwordUpdateSuccess',
         }))
         .then(onSuccess)
         .catch(error => {

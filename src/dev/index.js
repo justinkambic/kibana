@@ -17,6 +17,7 @@
  * under the License.
  */
 
+export { createToolingLog } from './tooling_log';
 export {
   createAutoJUnitReporter,
   setupJUnitReportGeneration,

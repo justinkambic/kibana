@@ -64,8 +64,7 @@ export function CalendarsListTable({
     {
       field: 'events_length',
       name: 'Events',
-      sortable: true,
-      render: (eventsLength) => `${eventsLength} ${eventsLength === 1 ? 'event' : 'events'}`
+      sortable: true
     }
   ];
 

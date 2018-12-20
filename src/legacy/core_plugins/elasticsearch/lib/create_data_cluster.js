@@ -29,6 +29,10 @@ export function createDataCluster(server) {
   }
 
   function getConfig() {
+    if (config.get('elasticsearch.tribe.hosts')) {
+      return config.get('elasticsearch.tribe');
+    }
+
     return config.get('elasticsearch');
   }
 

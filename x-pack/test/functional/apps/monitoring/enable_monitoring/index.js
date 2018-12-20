@@ -19,6 +19,7 @@ export default function ({ getService, getPageObjects }) {
       await browser.setWindowSize(1600, 1000);
       await PageObjects.monitoring.navigateTo();
       await noData.isOnNoDataPage();
+      await PageObjects.header.resumeAutoRefresh();
     });
 
     after(async () => {

@@ -18,7 +18,6 @@ import { checkFullLicense } from 'plugins/ml/license/check_license';
 import { checkCreateJobsPrivilege } from 'plugins/ml/privilege/check_privilege';
 import template from './new_job.html';
 import saveStatusTemplate from 'plugins/ml/jobs/new_job/advanced/save_status_modal/save_status_modal.html';
-import { getAdvancedJobConfigurationBreadcrumbs } from 'plugins/ml/jobs/breadcrumbs';
 import {
   SearchItemsProvider,
   createJobForSaving,
@@ -43,7 +42,6 @@ import { initPromise } from 'plugins/ml/util/promise';
 uiRoutes
   .when('/jobs/new_job/advanced', {
     template,
-    k7Breadcrumbs: getAdvancedJobConfigurationBreadcrumbs,
     resolve: {
       CheckLicense: checkFullLicense,
       privileges: checkCreateJobsPrivilege,
@@ -57,7 +55,6 @@ uiRoutes
   })
   .when('/jobs/new_job/advanced/:jobId', {
     template,
-    k7Breadcrumbs: getAdvancedJobConfigurationBreadcrumbs,
     resolve: {
       CheckLicense: checkFullLicense,
       privileges: checkCreateJobsPrivilege,

@@ -14,6 +14,7 @@ import {
 
 export default async function ({ readConfigFile }) {
 
+  // Read the Kibana API integration tests config file so that we can utilize its services.
   const kibanaAPITestsConfig = await readConfigFile(require.resolve('../../../test/api_integration/config.js'));
   const xPackFunctionalTestsConfig = await readConfigFile(require.resolve('../functional/config.js'));
   const kibanaCommonConfig = await readConfigFile(require.resolve('../../../test/common/config.js'));

@@ -44,7 +44,6 @@ export default class ClusterManager {
   constructor(opts, config, basePathProxy) {
     this.log = new Log(opts.quiet, opts.silent);
     this.addedCount = 0;
-    this.inReplMode = !!opts.repl;
     this.basePathProxy = basePathProxy;
 
     const serverArgv = [];
@@ -201,12 +200,6 @@ export default class ClusterManager {
   }
 
   setupManualRestart() {
-    // If we're in REPL mode, the user can use the REPL to manually restart.
-    // The setupManualRestart method interferes with stdin/stdout, in a way
-    // that negatively affects the REPL.
-    if (this.inReplMode) {
-      return;
-    }
     const readline = require('readline');
     const rl = readline.createInterface(process.stdin, process.stdout);
 

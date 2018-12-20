@@ -23,9 +23,11 @@ import expect from 'expect.js';
 import { fromKueryExpression, toElasticsearchQuery } from '../../kuery';
 
 describe('build query', function () {
+  const configStub = { get: () => true };
+
   describe('buildQueryFromKuery', function () {
     it('should return the parameters of an Elasticsearch bool query', function () {
-      const result = buildQueryFromKuery(null, [], true);
+      const result = buildQueryFromKuery(null, [], configStub);
       const expected = {
         must: [],
         filter: [],
@@ -47,7 +49,7 @@ describe('build query', function () {
         }
       );
 
-      const result = buildQueryFromKuery(indexPattern, queries, true);
+      const result = buildQueryFromKuery(indexPattern, queries, configStub);
 
       expect(result.filter).to.eql(expectedESQueries);
     });
@@ -55,7 +57,7 @@ describe('build query', function () {
     it('should throw a useful error if it looks like query is using an old, unsupported syntax', function () {
       const oldQuery = { query: 'is(foo, bar)', language: 'kuery' };
 
-      expect(buildQueryFromKuery).withArgs(indexPattern, [oldQuery], true).to.throwError(
+      expect(buildQueryFromKuery).withArgs(indexPattern, [oldQuery], configStub).to.throwError(
         /It looks like you're using an outdated Kuery syntax./
       );
     });

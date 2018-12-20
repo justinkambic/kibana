@@ -8,7 +8,7 @@
 
 import _ from 'lodash';
 
-import { aggTypes } from 'ui/agg_types';
+import { aggTypes } from 'ui/agg_types/index';
 import { addJobValidationMethods } from 'plugins/ml/../common/util/validation_utils';
 import { parseInterval } from 'plugins/ml/../common/util/parse_interval';
 
@@ -20,7 +20,6 @@ import { getSafeAggregationName } from 'plugins/ml/../common/util/job_utils';
 import { checkLicenseExpired } from 'plugins/ml/license/check_license';
 import { checkCreateJobsPrivilege } from 'plugins/ml/privilege/check_privilege';
 import { IntervalHelperProvider } from 'plugins/ml/util/ml_time_buckets';
-import { getCreateSingleMetricJobBreadcrumbs } from 'plugins/ml/jobs/breadcrumbs';
 import { filterAggTypes } from 'plugins/ml/jobs/new_job/simple/components/utils/filter_agg_types';
 import { validateJob } from 'plugins/ml/jobs/new_job/simple/components/utils/validate_job';
 import { adjustIntervalDisplayed } from 'plugins/ml/jobs/new_job/simple/components/utils/adjust_interval';
@@ -49,7 +48,6 @@ import { timefilter } from 'ui/timefilter';
 uiRoutes
   .when('/jobs/new_job/simple/single_metric', {
     template,
-    k7Breadcrumbs: getCreateSingleMetricJobBreadcrumbs,
     resolve: {
       CheckLicense: checkLicenseExpired,
       privileges: checkCreateJobsPrivilege,
@@ -71,8 +69,7 @@ module
     $filter,
     $timeout,
     Private,
-    AppState,
-    i18n) {
+    AppState) {
 
     timefilter.enableTimeRangeSelector();
     timefilter.disableAutoRefreshSelector();
@@ -127,28 +124,8 @@ module
 
     timeBasedIndexCheck(indexPattern, true);
 
-    $scope.indexPatternLinkText = i18n('xpack.ml.newJob.simple.singleMetric.noResultsFound.indexPatternLinkText', {
-      defaultMessage: 'full {indexPatternTitle} data',
-      values: { indexPatternTitle: indexPattern.title }
-    });
-    $scope.nameNotValidMessage = i18n('xpack.ml.newJob.simple.singleMetric.nameNotValidMessage', {
-      defaultMessage: 'Enter a name for the job'
-    });
-    $scope.showAdvancedButtonAriaLabel = i18n('xpack.ml.newJob.simple.singleMetric.showAdvancedButtonAriaLabel', {
-      defaultMessage: 'Show Advanced'
-    });
-    $scope.hideAdvancedButtonAriaLabel = i18n('xpack.ml.newJob.simple.singleMetric.hideAdvancedButtonAriaLabel', {
-      defaultMessage: 'Hide Advanced'
-    });
     const pageTitle = (savedSearch.id !== undefined) ?
-      i18n('xpack.ml.newJob.simple.singleMetric.savedSearchPageTitle', {
-        defaultMessage: 'saved search {savedSearchTitle}',
-        values: { savedSearchTitle: savedSearch.title }
-      })
-      : i18n('xpack.ml.newJob.simple.singleMetric.indexPatternPageTitle', {
-        defaultMessage: 'index pattern {indexPatternTitle}',
-        values: { indexPatternTitle: indexPattern.title }
-      });
+      `saved search ${savedSearch.title}` : `index pattern ${indexPattern.title}`;
 
     $scope.ui = {
       indexPattern,
@@ -163,9 +140,7 @@ module
       fields: [],
       timeFields: [],
       intervals: [{
-        title: i18n('xpack.ml.newJob.simple.singleMetric.autoIntervalUnitTitle', {
-          defaultMessage: 'Auto'
-        }),
+        title: 'Auto',
         value: 'auto',
       /*enabled: function (agg) {
         // not only do we need a time field, but the selected field needs
@@ -173,49 +148,31 @@ module
         return agg.fieldIsTimeField();
       }*/
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.millisecondIntervalUnitTitle', {
-          defaultMessage: 'Millisecond'
-        }),
+        title: 'Millisecond',
         value: 'ms'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.secondIntervalUnitTitle', {
-          defaultMessage: 'Second'
-        }),
+        title: 'Second',
         value: 's'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.minuteIntervalUnitTitle', {
-          defaultMessage: 'Minute'
-        }),
+        title: 'Minute',
         value: 'm'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.hourlyIntervalUnitTitle', {
-          defaultMessage: 'Hourly'
-        }),
+        title: 'Hourly',
         value: 'h'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.dailyIntervalUnitTitle', {
-          defaultMessage: 'Daily'
-        }),
+        title: 'Daily',
         value: 'd'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.weeklyIntervalUnitTitle', {
-          defaultMessage: 'Weekly'
-        }),
+        title: 'Weekly',
         value: 'w'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.monthlyIntervalUnitTitle', {
-          defaultMessage: 'Monthly'
-        }),
+        title: 'Monthly',
         value: 'M'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.yearlyIntervalUnitTitle', {
-          defaultMessage: 'Yearly'
-        }),
+        title: 'Yearly',
         value: 'y'
       }, {
-        title: i18n('xpack.ml.newJob.simple.singleMetric.customIntervalUnitTitle', {
-          defaultMessage: 'Custom'
-        }),
+        title: 'Custom',
         value: 'custom'
       }],
       chartHeight: 310,
@@ -400,12 +357,8 @@ module
                 saveNewDatafeed(job, true);
               })
               .catch((resp) => {
-                msgs.error(i18n('xpack.ml.newJob.simple.singleMetric.openJobErrorMessage', {
-                  defaultMessage: 'Could not open job: '
-                }), resp);
-                msgs.error(i18n('xpack.ml.newJob.simple.singleMetric.creatingDatafeedErrorMessage', {
-                  defaultMessage: 'Job created, creating datafeed anyway'
-                }));
+                msgs.error('Could not open job: ', resp);
+                msgs.error('Job created, creating datafeed anyway');
                 // if open failed, still attempt to create the datafeed
                 // as it may have failed because we've hit the limit of open jobs
                 saveNewDatafeed(job, false);
@@ -414,9 +367,7 @@ module
           })
           .catch((resp) => {
             // save failed
-            msgs.error(i18n('xpack.ml.newJob.simple.singleMetric.saveFailedErrorMessage', {
-              defaultMessage: 'Save failed: '
-            }), resp.resp);
+            msgs.error('Save failed: ', resp.resp);
           });
       } else {
         // show the advanced section as the model memory limit is invalid
@@ -459,16 +410,12 @@ module
                 })
                 .catch((resp) => {
                   // datafeed failed
-                  msgs.error(i18n('xpack.ml.newJob.simple.singleMetric.datafeedNotStartedErrorMessage', {
-                    defaultMessage: 'Could not start datafeed: '
-                  }), resp);
+                  msgs.error('Could not start datafeed: ', resp);
                 });
             }
           })
           .catch((resp) => {
-            msgs.error(i18n('xpack.ml.newJob.simple.singleMetric.saveDatafeedFailedErrorMessage', {
-              defaultMessage: 'Save datafeed failed: '
-            }), resp);
+            msgs.error('Save datafeed failed: ', resp);
           });
       }
     };

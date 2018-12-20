@@ -7,26 +7,15 @@
 /*
  * Logstash Node Pipeline View
  */
-import React from 'react';
+import { find } from 'lodash';
 import uiRoutes from'ui/routes';
-import moment from 'moment';
 import { ajaxErrorHandlersProvider } from 'plugins/monitoring/lib/ajax_error_handler';
 import { routeInitProvider } from 'plugins/monitoring/lib/route_init';
 import { CALCULATE_DURATION_SINCE } from '../../../../common/constants';
 import { formatTimestampToDuration } from '../../../../common/format_timestamp_to_duration';
 import template from './index.html';
+import { timefilter } from 'ui/timefilter';
 import { i18n } from '@kbn/i18n';
-import { List } from 'plugins/monitoring/components/logstash/pipeline_viewer/models/list';
-import { PipelineState } from 'plugins/monitoring/components/logstash/pipeline_viewer/models/pipeline_state';
-import { PipelineViewer } from 'plugins/monitoring/components/logstash/pipeline_viewer';
-import { Pipeline } from 'plugins/monitoring/components/logstash/pipeline_viewer/models/pipeline';
-import { MonitoringViewBaseController } from '../../base_controller';
-import { I18nProvider } from '@kbn/i18n/react';
-import {
-  EuiPageBody,
-  EuiPage,
-  EuiPageContent,
-} from '@elastic/eui';
 
 function getPageData($injector) {
   const $route = $injector.get('$route');
@@ -38,9 +27,7 @@ function getPageData($injector) {
   const { ccs, cluster_uuid: clusterUuid } = globalState;
   const pipelineId = $route.current.params.id;
   const pipelineHash = $route.current.params.hash || '';
-  const url = pipelineHash
-    ? `../api/monitoring/v1/clusters/${clusterUuid}/logstash/pipeline/${pipelineId}/${pipelineHash}`
-    : `../api/monitoring/v1/clusters/${clusterUuid}/logstash/pipeline/${pipelineId}`;
+  const url = `../api/monitoring/v1/clusters/${clusterUuid}/logstash/pipeline/${pipelineId}/${pipelineHash}`;
   return $http.post(url, {
     ccs
   })
@@ -85,47 +72,32 @@ uiRoutes.when('/logstash/pipelines/:id/:hash?', {
     },
     pageData: getPageData
   },
-  controller: class extends MonitoringViewBaseController {
-    constructor($injector, $scope, i18n) {
-      const config = $injector.get('config');
-      const dateFormat = config.get('dateFormat');
+  controller($injector, $scope, i18n) {
+    const $route = $injector.get('$route');
+    const $executor = $injector.get('$executor');
+    const globalState = $injector.get('globalState');
+    const title = $injector.get('title');
 
-      super({
-        title: i18n('xpack.monitoring.logstash.pipeline.routeTitle', {
-          defaultMessage: 'Logstash - Pipeline'
-        }),
-        storageKey: 'logstash.pipelines',
-        getPageData,
-        reactNodeId: 'monitoringLogstashPipelineApp',
-        $scope,
-        $injector
-      });
+    timefilter.disableTimeRangeSelector(); // Do not display time picker in UI
+    timefilter.enableAutoRefreshSelector();
 
-      const timeseriesTooltipXValueFormatter = xValue =>
-        moment(xValue).format(dateFormat);
-
-      $scope.$watch(() => this.data, data => {
-        if (!data || !data.pipeline) {
-          return;
-        }
-        this.pipelineState = new PipelineState(data.pipeline);
-        this.renderReact(
-          <I18nProvider>
-            <EuiPage>
-              <EuiPageBody>
-                <EuiPageContent>
-                  <PipelineViewer
-                    pipeline={List.fromPipeline(
-                      Pipeline.fromPipelineGraph(this.pipelineState.config.graph)
-                    )}
-                    timeseriesTooltipXValueFormatter={timeseriesTooltipXValueFormatter}
-                  />
-                </EuiPageContent>
-              </EuiPageBody>
-            </EuiPage>
-          </I18nProvider>
-        );
-      });
+    function setClusters(clusters) {
+      $scope.clusters = clusters;
+      $scope.cluster = find($scope.clusters, { cluster_uuid: globalState.cluster_uuid });
     }
+    setClusters($route.current.locals.clusters);
+    $scope.pageData = $route.current.locals.pageData;
+    title($scope.cluster, i18n('xpack.monitoring.logstash.pipeline.routeTitle', {
+      defaultMessage: 'Logstash - Pipeline'
+    }));
+
+    $executor.register({
+      execute: () => getPageData($injector),
+      handleResponse: (response) => {
+        $scope.pageData = response;
+      }
+    });
+    $executor.start($scope);
+    $scope.$on('$destroy', $executor.destroy);
   }
 });

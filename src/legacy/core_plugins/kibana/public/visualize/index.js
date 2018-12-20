@@ -31,7 +31,6 @@ import visualizeListingTemplate from './listing/visualize_listing.html';
 import { VisualizeListingController } from './listing/visualize_listing';
 import { VisualizeConstants } from './visualize_constants';
 import { FeatureCatalogueRegistryProvider, FeatureCatalogueCategory } from 'ui/registry/feature_catalogue';
-import { getLandingBreadcrumbs, getWizardStep1Breadcrumbs } from './breadcrumbs';
 
 uiRoutes
   .defaults(/visualize/, {
@@ -39,7 +38,6 @@ uiRoutes
   })
   .when(VisualizeConstants.LANDING_PAGE_PATH, {
     template: visualizeListingTemplate,
-    k7Breadcrumbs: getLandingBreadcrumbs,
     controller: VisualizeListingController,
     controllerAs: 'listingController',
     resolve: {
@@ -48,7 +46,6 @@ uiRoutes
   })
   .when(VisualizeConstants.WIZARD_STEP_1_PAGE_PATH, {
     template: visualizeListingTemplate,
-    k7Breadcrumbs: getWizardStep1Breadcrumbs,
     controller: VisualizeListingController,
     controllerAs: 'listingController',
     resolve: {

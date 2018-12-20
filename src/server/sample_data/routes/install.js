@@ -43,7 +43,8 @@ function insertDataIntoIndex(dataIndexConfig, index, nowReference, request, serv
 
     const insertCmd = {
       index: {
-        _index: index
+        _index: index,
+        _type: '_doc',
       }
     };
 

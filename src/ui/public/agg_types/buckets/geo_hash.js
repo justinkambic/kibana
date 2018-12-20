@@ -18,7 +18,7 @@
  */
 
 import _ from 'lodash';
-import chrome from '../../chrome';
+import chrome from 'ui/chrome';
 import { BucketAggType } from './_bucket_agg_type';
 import precisionTemplate from '../controls/precision.html';
 import { geohashColumns } from '../../utils/decode_geo_hash';

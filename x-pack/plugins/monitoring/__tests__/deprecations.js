@@ -112,6 +112,24 @@ describe('monitoring plugin deprecations', function () {
     expect(log.called).to.be(false);
   });
 
+  it('should log when deprecating node_resolver', function () {
+    const settings = {
+      node_resolver: 'uuid'
+    };
+
+    const log = sinon.spy();
+    transformDeprecations(settings, log);
+    expect(log.calledOnce).to.be(true);
+  });
+
+  it(`shouldn't log when node_resolver isn't present`, function () {
+    const settings = {};
+
+    const log = sinon.spy();
+    transformDeprecations(settings, log);
+    expect(log.called).to.be(false);
+  });
+
   describe('cluster_alerts.email_notifications.email_address', function () {
     it(`shouldn't log when email notifications are disabled`, function () {
       const settings = {

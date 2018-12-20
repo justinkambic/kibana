@@ -44,10 +44,6 @@ Object {
       "!CAMELLIA",
     ],
     "enabled": false,
-    "supportedProtocols": Array [
-      "TLSv1.1",
-      "TLSv1.2",
-    ],
   },
 }
 `;

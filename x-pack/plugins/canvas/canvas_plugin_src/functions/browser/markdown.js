@@ -30,9 +30,7 @@ export const markdown = () => ({
     },
   },
   fn: (context, args) => {
-    const compileFunctions = args.expression.map(str =>
-      Handlebars.compile(String(str), { knownHelpersOnly: true })
-    );
+    const compileFunctions = args.expression.map(str => Handlebars.compile(String(str)));
     const ctx = {
       columns: [],
       rows: [],

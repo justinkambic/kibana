@@ -43,5 +43,6 @@
     "x-pack/plugins/infra/public/utils/loading_state/loading_result.ts",
     "x-pack/plugins/infra/server/graphql/types.ts",
     "x-pack/plugins/infra/server/lib/domains/log_entries_domain/log_entries_domain.ts"
+
   ]
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import chrome from '../../../chrome';
+import chrome from 'ui/chrome';
 import { dateRange } from '../../../utils/date_range';
 import { buildRangeFilter } from '@kbn/es-query';
 

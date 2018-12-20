@@ -47,18 +47,14 @@ export async function initializeInterpreter() {
   return functionList;
 }
 
-export async function getInitializedFunctions() {
-  return functionList;
-}
-
 // Use the above promise to seed the interpreter with the functions it can defer to
-export async function interpretAst(ast, context, handlers) {
+export async function interpretAst(ast, context) {
   // Load plugins before attempting to get functions, otherwise this gets racey
   return Promise.all([functionList, getBrowserRegistries()])
     .then(([serverFunctionList]) => {
       return socketInterpreterProvider({
         types: typesRegistry.toJS(),
-        handlers: { ...handlers, ...createHandlers(socket) },
+        handlers: createHandlers(socket),
         functions: functionsRegistry.toJS(),
         referableFunctions: serverFunctionList,
         socket: socket,

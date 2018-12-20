@@ -124,7 +124,8 @@ export function VisualBuilderPageProvider({ getService, getPageObjects }) {
       return await gaugeCount.getVisibleText();
     }
 
-    async clickTopN() {
+    async clickTopN()
+    {
       await testSubjects.click('top_nTsvbTypeBtn');
       await PageObjects.header.waitUntilLoadingHasFinished();
     }

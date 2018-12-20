@@ -11,7 +11,7 @@ Compile the CSS with `./node_modules/grunt/bin/grunt uiFramework:compileCss` (OS
 `.\node_modules\grunt\bin\grunt uiFramework:compileCss` (Windows).
 
 You can view interactive documentation by running `yarn uiFramework:start` and then visiting
-[http://localhost:8020/](http://localhost:8020/). This will also start watching the SCSS files, and will recompile the CSS
+`http://localhost:8020/`. This will also start watching the SCSS files, and will recompile the CSS
 automatically for you when you make changes.
 
 You can run `node scripts/jest --watch` to watch for changes and run the tests as you code.
@@ -148,6 +148,11 @@ If a component has subcomponents (e.g. ToolBar and ToolBarSearch), tightly-coupl
 Button and ButtonGroup), or you just want to group some related components together (e.g. TextInput,
 TextArea, and CheckBox), then they belong in the same logical grouping. In this case, you can create
 additional SCSS files for these components in the same component directory.
+
+### Writing CSS
+
+Check out our [CSS style guide](https://github.com/elastic/kibana/blob/master/style_guides/css_style_guide.md)
+and [SCSS style guide](https://github.com/elastic/kibana/blob/master/style_guides/scss_style_guide.md).
 
 ## Benefits
 

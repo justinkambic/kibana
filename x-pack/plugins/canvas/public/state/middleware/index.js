@@ -8,7 +8,6 @@ import { applyMiddleware, compose } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { getWindow } from '../../lib/get_window';
 import { aeroelastic } from './aeroelastic';
-import { breadcrumbs } from './breadcrumbs';
 import { esPersistMiddleware } from './es_persist';
 import { fullscreen } from './fullscreen';
 import { historyMiddleware } from './history';
@@ -23,7 +22,6 @@ const middlewares = [
     esPersistMiddleware,
     historyMiddleware,
     aeroelastic,
-    breadcrumbs,
     fullscreen,
     inFlight,
     appReady,

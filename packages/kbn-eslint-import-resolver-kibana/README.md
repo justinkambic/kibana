@@ -1,4 +1,4 @@
-# @kbn/eslint-import-resolver-kibana
+# @elastic/eslint-import-resolver-kibana
 
 Resolver for Kibana imports, meant to be used with [eslint-plugin-import](https://github.com/benmosher/eslint-plugin-import).
 

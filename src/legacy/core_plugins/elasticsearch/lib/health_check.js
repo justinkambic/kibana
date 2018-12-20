@@ -21,12 +21,14 @@ import Promise from 'bluebird';
 import elasticsearch from 'elasticsearch';
 import kibanaVersion from './kibana_version';
 import { ensureEsVersion } from './ensure_es_version';
+import { ensureNotTribe } from './ensure_not_tribe';
 
 const NoConnections = elasticsearch.errors.NoConnections;
 
 export default function (plugin, server) {
   const config = server.config();
   const callAdminAsKibanaUser = server.plugins.elasticsearch.getCluster('admin').callWithInternalUser;
+  const callDataAsKibanaUser = server.plugins.elasticsearch.getCluster('data').callWithInternalUser;
   const REQUEST_DELAY = config.get('elasticsearch.healthCheck.delay');
 
   plugin.status.yellow('Waiting for Elasticsearch');
@@ -58,7 +60,14 @@ export default function (plugin, server) {
   function check() {
     const healthCheck =
       waitForPong(callAdminAsKibanaUser)
-        .then(waitForEsVersion);
+        .then(waitForEsVersion)
+        .then(() => ensureNotTribe(callAdminAsKibanaUser))
+        .then(() => {
+          if (config.get('elasticsearch.tribe.hosts')) {
+            return waitForPong(callDataAsKibanaUser)
+              .then(() => ensureEsVersion(server, kibanaVersion.get(), callDataAsKibanaUser));
+          }
+        });
 
     return healthCheck
       .then(setGreenStatus)

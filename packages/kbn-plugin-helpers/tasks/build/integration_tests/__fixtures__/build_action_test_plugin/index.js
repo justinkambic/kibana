@@ -17,9 +17,10 @@
  * under the License.
  */
 
-module.exports = kibana =>
-  new kibana.Plugin({
-    uiExports: {
-      hacks: ['plugins/test_plugin/hack.js'],
-    },
-  });
+module.exports = kibana => new kibana.Plugin({
+  uiExports: {
+    hacks: [
+      'plugins/test_plugin/hack.js'
+    ]
+  }
+});

@@ -12,7 +12,6 @@ import ReactDOM from 'react-dom';
 import { uiModules } from 'ui/modules';
 const module = uiModules.get('apps/ml', ['react']);
 
-import { getCreateFilterListBreadcrumbs, getEditFilterListBreadcrumbs } from '../../breadcrumbs';
 import { checkFullLicense } from 'plugins/ml/license/check_license';
 import { checkGetJobsPrivilege, checkPermission } from 'plugins/ml/privilege/check_privilege';
 import { getMlNodeCount } from 'plugins/ml/ml_nodes_check/check_ml_nodes';
@@ -30,7 +29,6 @@ const template = `
 uiRoutes
   .when('/settings/filter_lists/new_filter_list', {
     template,
-    k7Breadcrumbs: getCreateFilterListBreadcrumbs,
     resolve: {
       CheckLicense: checkFullLicense,
       privileges: checkGetJobsPrivilege,
@@ -40,7 +38,6 @@ uiRoutes
   })
   .when('/settings/filter_lists/edit_filter_list/:filterId', {
     template,
-    k7Breadcrumbs: getEditFilterListBreadcrumbs,
     resolve: {
       CheckLicense: checkFullLicense,
       privileges: checkGetJobsPrivilege,

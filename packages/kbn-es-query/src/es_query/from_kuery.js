@@ -19,7 +19,8 @@
 
 import { fromLegacyKueryExpression, fromKueryExpression, toElasticsearchQuery, nodeTypes } from '../kuery';
 
-export function buildQueryFromKuery(indexPattern, queries = [], allowLeadingWildcards) {
+export function buildQueryFromKuery(indexPattern, queries = [], config) {
+  const allowLeadingWildcards = config.get('query:allowLeadingWildcards');
   const queryASTs = queries.map(query => {
     try {
       return fromKueryExpression(query.query, { allowLeadingWildcards });

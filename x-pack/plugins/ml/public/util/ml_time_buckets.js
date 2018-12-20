@@ -21,28 +21,29 @@ import { inherits } from 'plugins/ml/util/inherits';
 const unitsDesc = dateMath.unitsDesc;
 const largeMax = unitsDesc.indexOf('w');    // Multiple units of week or longer converted to days for ES intervals.
 
-import { TimeBuckets } from 'ui/time_buckets';
+import { TimeBuckets as KibanaTimeBuckets } from 'ui/time_buckets';
 export function IntervalHelperProvider(Private, config) {
 
   const calcAuto = Private(TimeBucketsCalcAutoIntervalProvider);
-  inherits(MlTimeBuckets, TimeBuckets);
 
-  function MlTimeBuckets() {
+  inherits(TimeBuckets, KibanaTimeBuckets);
+
+  function TimeBuckets() {
     this.barTarget = config.get('histogram:barTarget');
     this.maxBars = config.get('histogram:maxBars');
 
-    // return MlTimeBuckets.Super.call(this);
+    // return TimeBuckets.Super.call(this);
   }
 
-  MlTimeBuckets.prototype.setBarTarget = function (bt) {
+  TimeBuckets.prototype.setBarTarget = function (bt) {
     this.barTarget = bt;
   };
 
-  MlTimeBuckets.prototype.setMaxBars = function (mb) {
+  TimeBuckets.prototype.setMaxBars = function (mb) {
     this.maxBars = mb;
   };
 
-  MlTimeBuckets.prototype.getInterval = function () {
+  TimeBuckets.prototype.getInterval = function () {
     const self = this;
     const duration = self.getDuration();
     return decorateInterval(maybeScaleInterval(readInterval()), duration);
@@ -84,7 +85,7 @@ export function IntervalHelperProvider(Private, config) {
 
   // Returns an interval which in the last step of calculation is rounded to
   // the closest multiple of the supplied divisor (in seconds).
-  MlTimeBuckets.prototype.getIntervalToNearestMultiple = function (divisorSecs) {
+  TimeBuckets.prototype.getIntervalToNearestMultiple = function (divisorSecs) {
     const interval = this.getInterval();
     const intervalSecs = interval.asSeconds();
 
@@ -111,7 +112,7 @@ export function IntervalHelperProvider(Private, config) {
     return nearestMultipleInt;
   };
 
-  // Appends some MlTimeBuckets specific properties to the momentjs duration interval.
+  // Appends some TimeBuckets specific properties to the momentjs duration interval.
   // Uses the originalDuration from which the time bucket was created to calculate the overflow
   // property (i.e. difference between the supplied duration and the calculated bucket interval).
   function decorateInterval(interval, originalDuration) {
@@ -132,7 +133,7 @@ export function IntervalHelperProvider(Private, config) {
   }
 
 
-  return MlTimeBuckets;
+  return TimeBuckets;
 }
 
 export function getBoundsRoundedToInterval(bounds, interval, inclusiveEnd = false) {

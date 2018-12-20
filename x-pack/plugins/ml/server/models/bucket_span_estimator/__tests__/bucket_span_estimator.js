@@ -75,15 +75,16 @@ const formConfig = {
 describe('ML - BucketSpanEstimator', () => {
   let mockCallWithInternalUserFactory;
 
-  beforeEach(() => {
+  function prepareMock() {
     mockCallWithInternalUserFactory = sinon.mock(mockModule);
     mockCallWithInternalUserFactory
       .expects('callWithInternalUserFactory')
       .once()
       .returns(callWithRequest);
-  });
+  }
 
   it('call factory', () => {
+    prepareMock();
     expect(function () {
       estimateBucketSpanFactory(callWithRequest);
       mockCallWithInternalUserFactory.verify();
@@ -91,6 +92,7 @@ describe('ML - BucketSpanEstimator', () => {
   });
 
   it('call factory and estimator with security disabled', (done) => {
+    prepareMock();
     expect(function () {
       const estimateBucketSpan = estimateBucketSpanFactory(callWithRequest, mockServerFactory());
 
@@ -104,6 +106,7 @@ describe('ML - BucketSpanEstimator', () => {
   });
 
   it('call factory and estimator with security enabled and sufficient permissions.', (done) => {
+    prepareMock();
     expect(function () {
       const estimateBucketSpan = estimateBucketSpanFactory(callWithRequest, mockServerFactory(true));
 
@@ -117,6 +120,7 @@ describe('ML - BucketSpanEstimator', () => {
   });
 
   it('call factory and estimator with security enabled and insufficient permissions.', (done) => {
+    prepareMock();
     expect(function () {
       const estimateBucketSpan = estimateBucketSpanFactory(callWithRequest, mockServerFactory(true));
 
@@ -125,6 +129,113 @@ describe('ML - BucketSpanEstimator', () => {
         mockCallWithInternalUserFactory.verify();
         done();
       });
+
+    }).to.not.throwError('Not initialized.');
+  });
+
+  // The following 2 tests don't test against the final result of the bucket span estimator
+  // but instead inspect the payload/body of the search requests when running the estimates.
+  // Based on the `search.max_buckets` settings the range queries will have a different
+  // `gte` value we can test against. When `search.max_buckets` is `-1`, the duration should
+  // fall back to a default value of 10000 buckets.
+
+  // Sunday, February 12, 2017 12:59:54 AM GMT+01:00
+  const DURATION_END = 1486857594000;
+  // Sunday, February 5, 2017 2:59:54 AM GMT+01:00
+  const TEST1_EXPECTED_GTE = 1486259994000;
+  // Saturday, February 11, 2017 8:59:54 AM GMT+01:00
+  const TEST2_EXPECTED_GTE = 1486799994000;
+
+  it('call factory with mock max buckets response of -1', (done) => {
+    expect(function () {
+      let calledDone = false;
+      const responses = {
+        'cluster.getSettings': {
+          defaults: { 'search.max_buckets': '-1' }
+        }
+      };
+
+      const callWithRequestMock = (endpoint, payload) => {
+        if (endpoint === 'search' && calledDone === false) {
+          const gte = payload.body.query.bool.must[1].range.undefined.gte;
+          expect(gte).to.be(TEST1_EXPECTED_GTE);
+          done();
+          calledDone = true;
+        }
+        return new Promise((resolve) => {
+          const response = (typeof responses[endpoint] !== 'undefined') ? responses[endpoint] : {};
+          resolve(response);
+        });
+      };
+
+      mockCallWithInternalUserFactory = sinon.mock(mockModule);
+      mockCallWithInternalUserFactory
+        .expects('callWithInternalUserFactory')
+        .once()
+        .returns(callWithRequestMock);
+
+      const estimateBucketSpan = estimateBucketSpanFactory(callWithRequestMock, mockServerFactory());
+
+      estimateBucketSpan({
+        aggTypes: ['count'],
+        duration: { start: 0, end: DURATION_END },
+        fields: [null],
+        filters: [],
+        index: '',
+        query: {
+          bool: {
+            must: [{ query_string: { analyze_wildcard: true, query: '*' } }],
+            must_not: []
+          }
+        }
+      }).catch(() => {});
+
+    }).to.not.throwError('Not initialized.');
+  });
+
+  it('call factory with mock max buckets response of 1000', (done) => {
+    expect(function () {
+      let calledDone = false;
+      const responses = {
+        'cluster.getSettings': {
+          defaults: { 'search.max_buckets': '1000' }
+        }
+      };
+
+      const callWithRequestMock = (endpoint, payload) => {
+        if (endpoint === 'search' && calledDone === false) {
+          const gte = payload.body.query.bool.must[1].range.undefined.gte;
+          expect(gte).to.be(TEST2_EXPECTED_GTE);
+          done();
+          calledDone = true;
+        }
+        return new Promise((resolve) => {
+          const response = (typeof responses[endpoint] !== 'undefined') ? responses[endpoint] : {};
+          resolve(response);
+        });
+      };
+
+      mockCallWithInternalUserFactory = sinon.mock(mockModule);
+      mockCallWithInternalUserFactory
+        .expects('callWithInternalUserFactory')
+        .once()
+        .returns(callWithRequestMock);
+
+      const estimateBucketSpan = estimateBucketSpanFactory(callWithRequestMock, mockServerFactory());
+
+      estimateBucketSpan({
+        aggTypes: ['count'],
+        duration: { start: 0, end: DURATION_END },
+        fields: [null],
+        filters: [],
+        index: '',
+        query: {
+          bool: {
+            must: [{ query_string: { analyze_wildcard: true, query: '*' } }],
+            must_not: []
+          }
+        }
+      }).catch(() => {});
 
     }).to.not.throwError('Not initialized.');
   });

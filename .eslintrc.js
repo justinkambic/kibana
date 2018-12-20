@@ -59,16 +59,14 @@ module.exports = {
     {
       files: [
         '.eslintrc.js',
-        'packages/eslint-plugin-kibana-custom/**/*',
         'packages/kbn-config-schema/**/*',
         'packages/kbn-pm/**/*',
         'packages/kbn-es/**/*',
         'packages/elastic-datemath/**/*',
         'packages/kbn-i18n/**/*',
         'packages/kbn-dev-utils/**/*',
-        'packages/kbn-plugin-helpers/**/*',
+        'packages/kbn-i18n/**/*',
         'packages/kbn-plugin-generator/**/*',
-        'packages/kbn-test-subj-selector/**/*',
         'packages/kbn-test/**/*',
         'packages/kbn-eslint-import-resolver-kibana/**/*',
         'x-pack/plugins/apm/**/*',
@@ -296,16 +294,6 @@ module.exports = {
       rules: {
         'no-unused-vars': ['error', { ignoreRestSiblings: true }],
         'no-console': ['warn', { allow: ['error'] }],
-      },
-    },
-
-    /**
-     * GIS overrides
-     */
-    {
-      files: ['x-pack/plugins/gis/**/*'],
-      rules: {
-        'react/prefer-stateless-function': [0, { ignorePureComponents: false }],
       },
     },
 

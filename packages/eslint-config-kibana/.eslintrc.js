@@ -1,7 +1,6 @@
 const semver = require('semver');
 
 const PKG = require('../../package.json');
-const RESTRICTED_GLOBALS = require('./restricted_globals');
 
 module.exports = {
   parser: 'babel-eslint',
@@ -72,7 +71,7 @@ module.exports = {
     'no-path-concat': 'off',
     'no-proto': 'error',
     'no-redeclare': 'error',
-    'no-restricted-globals': ['error', ...RESTRICTED_GLOBALS],
+    'no-restricted-globals': [ 'error', 'context' ],
     'no-return-assign': 'off',
     'no-script-url': 'error',
     'no-sequences': 'error',

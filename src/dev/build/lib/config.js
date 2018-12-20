@@ -23,7 +23,7 @@ import { platform as getOsPlatform } from 'os';
 import { getVersionInfo } from './version_info';
 import { createPlatform } from './platform';
 
-export async function getConfig({ isRelease, targetAllPlatforms, versionQualifier }) {
+export async function getConfig({ isRelease, targetAllPlatforms }) {
   const pkgPath = resolve(__dirname, '../../../../package.json');
   const pkg = require(pkgPath);
   const repoRoot = dirname(pkgPath);
@@ -33,7 +33,6 @@ export async function getConfig({ isRelease, targetAllPlatforms, versionQualifie
 
   const versionInfo = await getVersionInfo({
     isRelease,
-    versionQualifier,
     pkg,
   });
 
@@ -44,10 +43,6 @@ export async function getConfig({ isRelease, targetAllPlatforms, versionQualifie
      */
     getKibanaPkg() {
       return pkg;
-    }
-
-    isRelease() {
-      return isRelease;
     }
 
     /**

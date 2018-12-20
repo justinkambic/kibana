@@ -4,6 +4,8 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 import React from 'react';
+import { render } from 'react-dom';
+import { find } from 'lodash';
 import uiRoutes from'ui/routes';
 import { routeInitProvider } from 'plugins/monitoring/lib/route_init';
 import { MonitoringViewBaseEuiTableController } from '../../';
@@ -25,19 +27,26 @@ uiRoutes.when('/logstash/nodes', {
   controller: class LsNodesList extends MonitoringViewBaseEuiTableController {
 
     constructor($injector, $scope) {
-      const kbnUrl = $injector.get('kbnUrl');
-
       super({
         title: 'Logstash - Nodes',
         storageKey: 'logstash.nodes',
         getPageData,
-        reactNodeId: 'monitoringLogstashNodesApp',
         $scope,
         $injector
       });
 
-      $scope.$watch(() => this.data, data => {
-        this.renderReact(
+      const $route = $injector.get('$route');
+      const kbnUrl = $injector.get('kbnUrl');
+      this.data = $route.current.locals.pageData;
+      const globalState = $injector.get('globalState');
+      $scope.cluster = find($route.current.locals.clusters, { cluster_uuid: globalState.cluster_uuid });
+
+      const renderReact = (data) => {
+        if (!data) {
+          return;
+        }
+
+        render(
           <I18nProvider>
             <Listing
               data={data.nodes}
@@ -47,8 +56,13 @@ uiRoutes.when('/logstash/nodes', {
               onTableChange={this.onTableChange}
               angular={{ kbnUrl, scope: $scope }}
             />
-          </I18nProvider>
+          </I18nProvider>,
+          document.getElementById('monitoringLogstashNodesApp')
         );
+      };
+
+      $scope.$watch(() => this.data, data => {
+        renderReact(data);
       });
     }
   }

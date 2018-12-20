@@ -37,17 +37,17 @@ describe('build query', function () {
       const filters = [
         {
           match_all: {},
-          meta: { type: 'match_all' },
+          meta: { type: 'match_all' }
         },
         {
           exists: { field: 'foo' },
-          meta: { type: 'exists' },
-        },
+          meta: { type: 'exists' }
+        }
       ];
 
       const expectedESQueries = [
         { match_all: {} },
-        { exists: { field: 'foo' } },
+        { exists: { field: 'foo' } }
       ];
 
       const result = buildQueryFromFilters(filters);
@@ -59,11 +59,13 @@ describe('build query', function () {
       const filters = [
         {
           match_all: {},
-          meta: { type: 'match_all', negate: true },
+          meta: { type: 'match_all', negate: true }
         },
       ];
 
-      const expectedESQueries = [{ match_all: {} }];
+      const expectedESQueries = [
+        { match_all: {} },
+      ];
 
       const result = buildQueryFromFilters(filters);
 
@@ -74,14 +76,14 @@ describe('build query', function () {
       const filters = [
         {
           query: { exists: { field: 'foo' } },
-          meta: { type: 'exists' },
-        },
+          meta: { type: 'exists' }
+        }
       ];
 
       const expectedESQueries = [
         {
-          exists: { field: 'foo' },
-        },
+          exists: { field: 'foo' }
+        }
       ];
 
       const result = buildQueryFromFilters(filters);
@@ -93,29 +95,15 @@ describe('build query', function () {
       const filters = [
         {
           query: { match: { extension: { query: 'foo', type: 'phrase' } } },
-          meta: { type: 'phrase' },
-        },
+          meta: { type: 'phrase' }
+        }
       ];
 
       const expectedESQueries = [
         {
           match_phrase: { extension: { query: 'foo' } },
-        },
+        }
       ];
-
-      const result = buildQueryFromFilters(filters);
-
-      expect(result.must).to.eql(expectedESQueries);
-    });
-
-    it('should not add query:queryString:options to query_string filters', function () {
-      const filters = [
-        {
-          query: { query_string: { query: 'foo' } },
-          meta: { type: 'query_string' },
-        },
-      ];
-      const expectedESQueries = [{ query_string: { query: 'foo' } }];
 
       const result = buildQueryFromFilters(filters);
 

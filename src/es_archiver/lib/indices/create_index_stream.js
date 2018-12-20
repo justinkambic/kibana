@@ -42,7 +42,7 @@ export function createCreateIndexStream({ client, stats, skipExisting, log, kiba
   }
 
   async function handleIndex(record) {
-    const { index, settings, mappings, aliases } = record.value;
+    const { index, settings, mappings } = record.value;
 
     async function attemptToCreate(attemptNumber = 1) {
       try {
@@ -53,7 +53,7 @@ export function createCreateIndexStream({ client, stats, skipExisting, log, kiba
         await client.indices.create({
           method: 'PUT',
           index,
-          body: { settings, mappings, aliases },
+          body: { settings, mappings },
         });
 
         if (index.startsWith('.kibana') && await isSpacesEnabled({ kibanaUrl })) {

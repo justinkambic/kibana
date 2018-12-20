@@ -347,7 +347,7 @@ export class VegaParser {
     }
 
     this._parseBool('zoomControl', res, true);
-    this._parseBool('scrollWheelZoom', res, false);
+    this._parseBool('scrollWheelZoom', res, true);
 
     const maxBounds = this._config.maxBounds;
     if (maxBounds !== undefined) {

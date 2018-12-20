@@ -33,9 +33,6 @@ interface KibanaFeatures {
   // installed (dev mode only feature).
   isOssModeSupported: boolean;
 
-  // Indicates whether we can run Kibana in REPL mode (dev mode only feature).
-  isReplModeSupported: boolean;
-
   // Indicates whether X-Pack plugin pack is installed and available.
   isXPackInstalled: boolean;
 }
@@ -53,10 +50,6 @@ export async function bootstrap({
   applyConfigOverrides,
   features,
 }: BootstrapArgs) {
-  if (cliArgs.repl && !features.isReplModeSupported) {
-    onRootShutdown('Kibana REPL mode can only be run in development mode.');
-  }
-
   const env = Env.createDefault({
     configs,
     cliArgs,

@@ -12,7 +12,7 @@ export async function callEsGraphExploreApi({ callCluster, index, query }) {
     return {
       ok: true,
       resp: await callCluster('transport.request', {
-        'path': '/' + encodeURIComponent(index) + '/_graph/explore',
+        'path': '/' + encodeURIComponent(index) + '/_xpack/graph/_explore',
         body: query,
         method: 'POST',
         query: {}

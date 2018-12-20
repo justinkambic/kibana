@@ -66,7 +66,6 @@ class RequestSelector extends Component {
         }}
         toolTipContent={request.description}
         toolTipPosition="left"
-        data-test-subj={`inspectorRequestChooser${request.name}`}
       >
         <EuiTextColor color={hasFailed ? 'danger' : 'default'}>
           {request.name}
@@ -90,7 +89,6 @@ class RequestSelector extends Component {
         iconSide="right"
         size="s"
         onClick={this.togglePopover}
-        data-test-subj="inspectorRequestChooser"
       >
         {this.props.selectedRequest.name}
       </EuiButtonEmpty>

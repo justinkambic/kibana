@@ -10,7 +10,8 @@ import phantom from '@elastic/node-phantom-simple';
 import { getPhantomOptions } from './phantom_options';
 import { PhantomDriver } from '../driver';
 import { promisify } from 'bluebird';
-import { safeChildProcess, exitCodeSuggestion } from '../../safe_child_process';
+import { safeChildProcess } from '../../safe_child_process';
+
 
 export class PhantomDriverFactory {
   constructor(binaryPath) {
@@ -66,7 +67,7 @@ export class PhantomDriverFactory {
         }
 
         const exit$ = Rx.fromEvent(browser.process, 'exit').pipe(
-          mergeMap(([code]) => Rx.throwError(new Error(`Phantom exited with code: ${code}. ${exitCodeSuggestion(code)}`)))
+          mergeMap(([code]) => Rx.throwError(new Error(`Phantom exited with code: ${code}`)))
         );
 
         const driver = new PhantomDriver({

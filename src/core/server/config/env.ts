@@ -49,7 +49,6 @@ export interface CliArgs {
   quiet: boolean;
   silent: boolean;
   watch: boolean;
-  repl: boolean;
   basePath: boolean;
   optimize: boolean;
   open: boolean;

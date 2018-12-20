@@ -1,7 +1,7 @@
 {
   "name": "@kbn/plugin-helpers",
   "private": true,
-  "version": "9.0.2",
+  "version": "7.1.5",
   "description": "Just some helpers for kibana plugin devs.",
   "main": "lib/index.js",
   "bin": {

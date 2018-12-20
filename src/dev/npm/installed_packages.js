@@ -78,14 +78,12 @@ export async function getInstalledPackages(options = {}) {
   return Object
     .keys(licenseInfo)
     .map(key => {
-      const { realPath, repository, isDevOnly } = licenseInfo[key];
-      if (realPath === directory) return;
-
       const keyParts = key.split('@');
       const name = keyParts.slice(0, -1).join('@');
       const version = keyParts[keyParts.length - 1];
 
       const licenses = resolveLicense(licenseInfo, key, licenseOverrides);
+      const { realPath, repository, isDevOnly } = licenseInfo[key];
 
       return {
         name,
@@ -97,5 +95,5 @@ export async function getInstalledPackages(options = {}) {
         isDevOnly
       };
     })
-    .filter(Boolean);
+    .filter(pkg => pkg.directory !== directory);
 }

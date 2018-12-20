@@ -22,6 +22,9 @@ import { getFunctionalTestGroupRunConfigs } from '../function_test_groups';
 
 const { version } = require('../../package.json');
 const KIBANA_INSTALL_DIR = `./build/oss/kibana-${version}-SNAPSHOT-${process.platform}-x86_64`;
+const KIBANA_BIN_PATH = process.platform.startsWith('win')
+  ? '.\\bin\\kibana.bat'
+  : './bin/kibana';
 
 module.exports = function (grunt) {
 
@@ -35,9 +38,9 @@ module.exports = function (grunt) {
       },
       cmd: runBuild
         ? `./build/${runBuild}/bin/kibana`
-        : process.execPath,
+        :  KIBANA_BIN_PATH,
       args: [
-        ...runBuild ? [] : [require.resolve('../../scripts/kibana'), '--oss'],
+        ...runBuild ? [] : ['--oss'],
 
         '--env.name=development',
         '--logging.json=false',

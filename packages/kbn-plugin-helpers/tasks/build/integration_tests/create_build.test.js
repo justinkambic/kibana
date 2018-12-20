@@ -71,9 +71,9 @@ describe('creating the build', () => {
 
   describe('skipInstallDependencies = true', () => {
     // set skipInstallDependencies to true for these tests
-    beforeEach(() => (PLUGIN.skipInstallDependencies = true));
+    beforeEach(() => PLUGIN.skipInstallDependencies = true);
     // set it back to false after
-    afterEach(() => (PLUGIN.skipInstallDependencies = false));
+    afterEach(() => PLUGIN.skipInstallDependencies = false);
 
     it('does not install node_modules as a part of build', async () => {
       expect(PLUGIN.skipInstallDependencies).toBe(true);

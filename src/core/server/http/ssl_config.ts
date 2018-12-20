@@ -45,9 +45,14 @@ const sslSchema = schema.object(
     key: schema.maybe(schema.string()),
     keyPassphrase: schema.maybe(schema.string()),
     redirectHttpFromPort: schema.maybe(schema.number()),
-    supportedProtocols: schema.arrayOf(
-      schema.oneOf([schema.literal('TLSv1'), schema.literal('TLSv1.1'), schema.literal('TLSv1.2')]),
-      { defaultValue: ['TLSv1.1', 'TLSv1.2'], minSize: 1 }
+    supportedProtocols: schema.maybe(
+      schema.arrayOf(
+        schema.oneOf([
+          schema.literal('TLSv1'),
+          schema.literal('TLSv1.1'),
+          schema.literal('TLSv1.2'),
+        ])
+      )
     ),
   },
   {
@@ -75,7 +80,7 @@ export class SslConfig {
   public keyPassphrase: string | undefined;
 
   public cipherSuites: string[];
-  public supportedProtocols: string[];
+  public supportedProtocols: string[] | undefined;
 
   /**
    * @internal
@@ -95,10 +100,8 @@ export class SslConfig {
    * Options that affect the OpenSSL protocol behavior via numeric bitmask of the SSL_OP_* options from OpenSSL Options.
    */
   public getSecureOptions() {
-    // our validation should ensure that this.supportedProtocols is at least an empty array,
-    // which the following logic depends upon.
-    if (this.supportedProtocols == null || this.supportedProtocols.length === 0) {
-      throw new Error(`supportedProtocols should be specified`);
+    if (this.supportedProtocols === undefined || this.supportedProtocols.length === 0) {
+      return 0;
     }
 
     const supportedProtocols = this.supportedProtocols;

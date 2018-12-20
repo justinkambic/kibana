@@ -191,6 +191,8 @@ export default function ({ getService, getPageObjects }) {
           expect(percentSimilar).to.be.lessThan(0.05);
 
         });
+
+
       });
 
       describe('Print PNG button', () => {

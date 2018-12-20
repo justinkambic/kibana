@@ -50,22 +50,21 @@ module.exports = function(plugin, run, options) {
     buildStep = createBuild(plugin, buildTarget, buildVersion, kibanaVersion, buildFiles);
   }
 
-  return buildStep.then(function() {
-    if (options.skipArchive) return;
-    return createPackage(plugin, buildTarget, buildVersion);
-  });
+  return buildStep
+    .then(function () {
+      if (options.skipArchive) return;
+      return createPackage(plugin, buildTarget, buildVersion);
+    });
 };
 
 function askForKibanaVersion() {
-  return inquirer
-    .prompt([
-      {
-        type: 'input',
-        name: 'kibanaVersion',
-        message: 'What version of Kibana are you building for?',
-      },
-    ])
-    .then(function(answers) {
-      return answers.kibanaVersion;
-    });
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'kibanaVersion',
+      message: 'What version of Kibana are you building for?'
+    }
+  ]).then(function (answers) {
+    return answers.kibanaVersion;
+  });
 }

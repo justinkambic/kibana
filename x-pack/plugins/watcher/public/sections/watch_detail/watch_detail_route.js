@@ -13,7 +13,6 @@ import './components/watch_detail';
 import { WATCH_HISTORY } from '../../../common/constants';
 import { updateWatchSections } from 'plugins/watcher/lib/update_management_sections';
 import 'plugins/watcher/services/license';
-import { getWatchDetailBreadcrumbs } from '../../lib/breadcrumbs';
 
 routes
   .when('/management/elasticsearch/watcher/watches/watch/:id', {
@@ -23,7 +22,6 @@ routes
 routes
   .when('/management/elasticsearch/watcher/watches/watch/:id/status', {
     template: template,
-    k7Breadcrumbs: getWatchDetailBreadcrumbs,
     resolve: {
       watchTabs: ($injector) => {
         const $route = $injector.get('$route');

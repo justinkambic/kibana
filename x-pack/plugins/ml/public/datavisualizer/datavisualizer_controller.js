@@ -22,7 +22,6 @@ import { decorateQuery, luceneStringToDsl } from '@kbn/es-query';
 import { notify, toastNotifications } from 'ui/notify';
 
 import { ML_JOB_FIELD_TYPES, KBN_FIELD_TYPES } from 'plugins/ml/../common/constants/field_types';
-import { getDataVisualizerBreadcrumbs } from './breadcrumbs';
 import { kbnTypeToMLJobType } from 'plugins/ml/util/field_types_utils';
 import { IntervalHelperProvider } from 'plugins/ml/util/ml_time_buckets';
 import { checkBasicLicense, isFullLicense } from 'plugins/ml/license/check_license';
@@ -37,7 +36,6 @@ import template from './datavisualizer.html';
 uiRoutes
   .when('/jobs/new_job/datavisualizer', {
     template,
-    k7Breadcrumbs: getDataVisualizerBreadcrumbs,
     resolve: {
       CheckLicense: checkBasicLicense,
       privileges: checkGetJobsPrivilege,
@@ -261,8 +259,7 @@ module
 
     function buildSearchQuery() {
       const searchQuery = luceneStringToDsl($scope.searchQueryText);
-      const queryStringOptions = config.get('query:queryString:options');
-      decorateQuery(searchQuery, queryStringOptions);
+      decorateQuery(searchQuery, config);
       return searchQuery;
     }
 

@@ -67,19 +67,11 @@ export default function init(input, output, sourceLocation = 'stored') {
       }
     }
     else if (/^https?:\/\//.test(sourceLocation)) {
-      const loadFrom = {
-        url: sourceLocation,
-        // Having dataType here is required as it doesn't allow jQuery to `eval` content
-        // coming from the external source thereby preventing XSS attack.
-        dataType: 'text',
-        kbnXsrfToken: false
-      };
-
+      const loadFrom = { url: sourceLocation, dataType: 'text', kbnXsrfToken: false };
       if (/https?:\/\/api.github.com/.test(sourceLocation)) {
         loadFrom.headers = { Accept: 'application/vnd.github.v3.raw' };
       }
-
-      $.ajax(loadFrom).done((data) => {
+      $.ajax(loadFrom).done(function (data) {
         resetToValues(data);
         input.moveToNextRequestEdge(true);
         input.highlightCurrentRequestsAndUpdateActionBar();

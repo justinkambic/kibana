@@ -37,12 +37,9 @@ export function parseConfig(serverConfig = {}, { ignoreCertAndKey = false } = {}
 
   const mapHost = nodeUrl => {
     const uri = url.parse(nodeUrl);
-    const httpsURI = uri.protocol === 'https:';
-    const httpURI = uri.protocol === 'http:';
-    const protocolPort = httpsURI && '443' || httpURI && '80';
     return {
       host: uri.hostname,
-      port: uri.port || protocolPort,
+      port: uri.port,
       protocol: uri.protocol,
       path: uri.pathname,
       query: uri.query,

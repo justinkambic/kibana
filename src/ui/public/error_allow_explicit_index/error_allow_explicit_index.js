@@ -25,10 +25,7 @@ import { KbnUrlProvider } from '../url';
 import template from './error_allow_explicit_index.html';
 
 uiRoutes
-  .when('/error/multi.allow_explicit_index', {
-    template,
-    k7Breadcrumbs: () => [{ text: 'Error' }],
-  });
+  .when('/error/multi.allow_explicit_index', { template });
 
 export function ErrorAllowExplicitIndexProvider(Private, Promise) {
   const kbnUrl = Private(KbnUrlProvider);

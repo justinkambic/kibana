@@ -19,6 +19,7 @@
 
 import _ from 'lodash';
 import { migrateFilter } from './migrate_filter';
+import { decorateQuery } from './decorate_query';
 
 /**
  * Create a filter that can be reversed for filters with negate set
@@ -58,7 +59,13 @@ const cleanFilter = function (filter) {
   return _.omit(filter, ['meta', '$state']);
 };
 
-export function buildQueryFromFilters(filters, indexPattern) {
+export function buildQueryFromFilters(filters, indexPattern, config) {
+  _.each(filters, function (filter) {
+    if (filter.query) {
+      decorateQuery(filter.query, config);
+    }
+  });
+
   return {
     must: (filters || [])
       .filter(filterNegate(false))

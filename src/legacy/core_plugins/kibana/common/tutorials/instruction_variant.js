@@ -31,7 +31,6 @@ export const INSTRUCTION_VARIANT = {
   JS: 'js',
   GO: 'go',
   JAVA: 'java',
-  LINUX: 'linux',
 };
 
 const DISPLAY_MAP = {
@@ -48,7 +47,6 @@ const DISPLAY_MAP = {
   [INSTRUCTION_VARIANT.JS]: 'RUM (JS)',
   [INSTRUCTION_VARIANT.GO]: 'Go',
   [INSTRUCTION_VARIANT.JAVA]: 'Java',
-  [INSTRUCTION_VARIANT.LINUX]: 'Linux',
 };
 
 /**

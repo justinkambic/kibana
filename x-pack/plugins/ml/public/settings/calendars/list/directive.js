@@ -16,7 +16,6 @@ import { checkFullLicense } from '../../../license/check_license';
 import { checkGetJobsPrivilege, checkPermission } from '../../../privilege/check_privilege';
 import { getMlNodeCount } from '../../../ml_nodes_check/check_ml_nodes';
 import { initPromise } from '../../../util/promise';
-import { getCalendarManagementBreadcrumbs } from '../../breadcrumbs';
 
 import uiRoutes from 'ui/routes';
 
@@ -30,7 +29,6 @@ const template = `
 uiRoutes
   .when('/settings/calendars_list', {
     template,
-    k7Breadcrumbs: getCalendarManagementBreadcrumbs,
     resolve: {
       CheckLicense: checkFullLicense,
       privileges: checkGetJobsPrivilege,

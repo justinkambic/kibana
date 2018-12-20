@@ -32,13 +32,13 @@ export const CreatePackageJsonTask = {
       private: true,
       description: pkg.description,
       keywords: pkg.keywords,
+      license: pkg.license,
       version: config.getBuildVersion(),
       branch: pkg.branch,
       build: {
         number: config.getBuildNumber(),
         sha: config.getBuildSha(),
         distributable: true,
-        release: config.isRelease(),
       },
       repository: pkg.repository,
       engines: {

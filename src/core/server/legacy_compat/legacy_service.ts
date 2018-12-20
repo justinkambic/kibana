@@ -135,13 +135,6 @@ export class LegacyService implements CoreService {
       plugins: deps.plugins,
     });
 
-    // The kbnWorkerType check is necessary to prevent the repl
-    // from being started multiple times in different processes.
-    // We only want one REPL.
-    if (this.coreContext.env.cliArgs.repl && process.env.kbnWorkerType === 'server') {
-      require('../../../cli/repl').startRepl(kbnServer);
-    }
-
     const httpConfig = await this.coreContext.configService
       .atPath('server', HttpConfig)
       .pipe(first())

@@ -24,10 +24,7 @@ import uiRoutes from '../routes';
 import template from './error_auto_create_index.html';
 
 uiRoutes
-  .when('/error/action.auto_create_index', {
-    template,
-    k7Breadcrumbs: () => [{ text: 'Error' }],
-  });
+  .when('/error/action.auto_create_index', { template });
 
 export function isAutoCreateIndexError(error) {
   return (

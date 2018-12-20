@@ -37,7 +37,7 @@ export function observeReadable(readable) {
 
     Rx.fromEvent(readable, 'error').pipe(
       first(),
-      map(err => Rx.throwError(err))
+      map(err => Rx.Observable.throw(err))
     )
   );
 }

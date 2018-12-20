@@ -35,17 +35,16 @@ module.exports = function(root) {
     '{lib,public,server,webpackShims,translations}/**/*',
   ];
 
-  return Object.assign(
-    {
-      root: root,
-      kibanaRoot: pkg.name === 'x-pack' ? resolve(root, '..') : resolve(root, '../../kibana'),
-      serverTestPatterns: ['server/**/__tests__/**/*.js'],
-      buildSourcePatterns: buildSourcePatterns,
-      skipInstallDependencies: false,
-      id: pkg.name,
-      pkg: pkg,
-      version: pkg.version,
-    },
-    config
-  );
+  return Object.assign({
+    root: root,
+    kibanaRoot: pkg.name === 'x-pack'
+      ? resolve(root, '..')
+      : resolve(root, '../../kibana'),
+    serverTestPatterns: ['server/**/__tests__/**/*.js'],
+    buildSourcePatterns: buildSourcePatterns,
+    skipInstallDependencies: false,
+    id: pkg.name,
+    pkg: pkg,
+    version: pkg.version,
+  }, config);
 };

@@ -96,7 +96,12 @@ describe('calling create_build', () => {
 
   it('uses only files passed in', async () => {
     const options = {
-      files: ['index.js', 'LICENSE.txt', 'plugins/**/*', '{server,public}/**/*'],
+      files: [
+        'index.js',
+        'LICENSE.txt',
+        'plugins/**/*',
+        '{server,public}/**/*'
+      ]
     };
 
     await buildAction(PLUGIN, noop, options);

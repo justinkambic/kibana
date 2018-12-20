@@ -6,8 +6,6 @@
 ++++
 
 You do not need to configure any settings to use APM. It is enabled by default.
-If you'd like to change any of the default values,
-copy and paste the relevant settings below into your `kibana.yml` configuration file.
 
 [float]
 [[general-apm-settings-kb]]
@@ -21,7 +19,7 @@ xpack.apm.ui.enabled:: Set to `false` to hide the APM plugin {kib} from the menu
 
 xpack.apm.ui.transactionGroupBucketSize:: Number of top transaction groups displayed in APM plugin in Kibana. Defaults to `100`.
 
-apm_oss.indexPattern:: Index pattern is used for integrations with Machine Learning and Kuery Bar. It must match all apm indices. Defaults to `apm-*`.
+apm_oss.indexPattern:: Index pattern is used for integrations with Machine Learning and Kuery Bar. It must match all apm indices. Defaults to `apm-&#42;`.
 
 apm_oss.errorIndices:: Matcher for indices containing error documents. Defaults to `apm-*`.
 

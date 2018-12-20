@@ -26,7 +26,6 @@ import { KibanaParsedUrl } from 'ui/url/kibana_parsed_url';
 import { XPackInfoProvider } from 'plugins/xpack_main/services/xpack_info';
 
 import appTemplate from './templates/index.html';
-import { getHomeBreadcrumbs, getWorkspaceBreadcrumbs } from './breadcrumbs';
 
 import './angular-venn-simple.js';
 import gws from './graphClientWorkspace.js';
@@ -73,7 +72,6 @@ if (uiRoutes.enable) {
 uiRoutes
   .when('/home', {
     template: appTemplate,
-    k7Breadcrumbs: getHomeBreadcrumbs,
     resolve: {
       //Copied from example found in wizard.js ( Kibana TODO - can't
       // IndexPatternsProvider abstract these implementation details better?)
@@ -97,7 +95,6 @@ uiRoutes
   })
   .when('/workspace/:id', {
     template: appTemplate,
-    k7Breadcrumbs: getWorkspaceBreadcrumbs,
     resolve: {
       savedWorkspace: function (savedGraphWorkspaces, courier, $route, i18n) {
         return savedGraphWorkspaces.get($route.current.params.id)
@@ -138,9 +135,7 @@ uiRoutes
 
 
 //========  Controller for basic UI ==================
-app.controller('graphuiPlugin', function ($scope, $route, $http, kbnUrl, Private, Promise, confirmModal, kbnBaseUrl, i18n, config) {
-
-  config.bindToScope($scope, 'k7design');
+app.controller('graphuiPlugin', function ($scope, $route, $interval, $http, kbnUrl, Private, Promise, confirmModal, kbnBaseUrl, i18n) {
 
   function handleSuccess(data) {
     return checkLicense(Private, Promise, kbnBaseUrl)

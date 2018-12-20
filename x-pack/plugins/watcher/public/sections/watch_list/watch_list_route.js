@@ -10,7 +10,6 @@ import { toastNotifications } from 'ui/notify';
 import template from './watch_list_route.html';
 import './components/watch_list';
 import 'plugins/watcher/services/license';
-import { getWatchListBreadcrumbs } from '../../lib/breadcrumbs';
 
 routes
   .when('/management/elasticsearch/watcher/', {
@@ -27,7 +26,6 @@ routes
       }
     },
     controllerAs: 'watchListRoute',
-    k7Breadcrumbs: getWatchListBreadcrumbs,
     resolve: {
       watches: ($injector) => {
         const watchesService = $injector.get('xpackWatcherWatchesService');

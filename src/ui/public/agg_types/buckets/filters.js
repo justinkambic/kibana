@@ -57,10 +57,8 @@ export const filtersBucketAgg = new BucketAggType({
             console.log('malformed filter agg params, missing "query" on input'); // eslint-disable-line no-console
             return;
           }
-          const config = chrome.getUiSettingsClient();
-          const queryStringOptions = config.get('query:queryString:options');
 
-          decorateQuery(query, queryStringOptions);
+          decorateQuery(query, chrome.getUiSettingsClient());
 
           const matchAllLabel = (filter.input.query === '' && _.has(query, 'match_all')) ? '*' : '';
           const label = filter.label || matchAllLabel || _.get(query, 'query_string.query') || angular.toJson(query);

@@ -17,6 +17,8 @@
  * under the License.
  */
 
+import { handleShortUrlError } from './lib/short_url_error';
+import { shortUrlAssertValid } from './lib/short_url_assert_valid';
 import { shortUrlLookupProvider } from './lib/short_url_lookup';
 import { createGotoRoute } from './goto';
 import { createShortenUrlRoute } from './shorten_url';
@@ -27,4 +29,22 @@ export function createRoutes(server) {
 
   server.route(createGotoRoute({ server, shortUrlLookup }));
   server.route(createShortenUrlRoute({ shortUrlLookup }));
+
+  // TODO remove deprecated '/shorten' API in master (7.0)
+  server.route({
+    method: 'POST',
+    path: '/shorten',
+    handler: async function (request) {
+      server.log(
+        ['warning', 'deprecation'],
+        `'/shorten' API has been deprecated and will be removed in 7.0, use the '/api/shorten_url' API instead`);
+      try {
+        shortUrlAssertValid(request.payload.url);
+        const urlId = await shortUrlLookup.generateUrlId(request.payload.url, request);
+        return urlId;
+      } catch (err) {
+        return handleShortUrlError(err);
+      }
+    }
+  });
 }

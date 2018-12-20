@@ -76,7 +76,6 @@ export default function ({ getService, getPageObjects }) {
       await PageObjects.visualize.clickEditorSidebarCollapse();
     });
 
-
     it('should still show all tags after sidebar has been collapsed', async function () {
       await PageObjects.visualize.clickEditorSidebarCollapse();
       // Give d3 tag cloud some time to rearrange tags
@@ -86,7 +85,7 @@ export default function ({ getService, getPageObjects }) {
       await PageObjects.common.sleep(1000);
       const data = await PageObjects.visualize.getTextTag();
       log.debug(data);
-      expect(data).to.eql(['32,212,254,720', '21,474,836,480', '20,401,094,656', '19,327,352,832', '18,253,611,008']);
+      expect(data).to.eql([ '32,212,254,720', '21,474,836,480', '20,401,094,656', '19,327,352,832', '18,253,611,008' ]);
     });
 
     it('should still show all tags after browser was resized very small', async function () {
@@ -98,6 +97,7 @@ export default function ({ getService, getPageObjects }) {
       expect(data).to.eql([ '32,212,254,720', '21,474,836,480', '20,401,094,656', '19,327,352,832', '18,253,611,008' ]);
     });
 
+
     it('should save and load', async function () {
       await PageObjects.visualize.saveVisualizationExpectSuccess(vizName1);
       const pageTitle = await PageObjects.common.getBreadcrumbPageTitle();
@@ -107,7 +107,6 @@ export default function ({ getService, getPageObjects }) {
       await PageObjects.visualize.loadSavedVisualization(vizName1);
       await PageObjects.visualize.waitForVisualization();
     });
-
 
 
     it('should show the tags and relative size', function () {

@@ -20,9 +20,10 @@ import { i18n } from '@kbn/i18n';
 
 routes.defaults(/\/management/, {
   resolve: {
-    securityManagementSection: function (ShieldUser, Private) {
+    securityManagementSection: function (ShieldUser, Private, esDataIsTribe) {
       const xpackInfo = Private(XPackInfoProvider);
       const showSecurityLinks = xpackInfo.get('features.security.showLinks');
+      const tribeTooltip = 'Not available when using a tribe node.';
 
       function deregisterSecurity() {
         management.deregister('security');
@@ -49,7 +50,8 @@ routes.defaults(/\/management/, {
               'xpack.security.management.usersTitle', {
                 defaultMessage: 'Users',
               }),
-            url: `#${USERS_PATH}`,
+            url: esDataIsTribe ? undefined : `#${USERS_PATH}`,
+            tooltip: esDataIsTribe ? tribeTooltip : undefined
           });
         }
 
@@ -61,7 +63,8 @@ routes.defaults(/\/management/, {
               'xpack.security.management.rolesTitle', {
                 defaultMessage: 'Roles',
               }),
-            url: `#${ROLES_PATH}`,
+            url: esDataIsTribe ? undefined : `#${ROLES_PATH}`,
+            tooltip: esDataIsTribe ? tribeTooltip : undefined
           });
         }
       }

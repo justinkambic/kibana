@@ -18,7 +18,6 @@
  */
 
 import expect from 'expect.js';
-import { delay } from 'bluebird';
 
 export default function ({ getService }) {
   const testSubjects = getService('testSubjects');
@@ -37,7 +36,6 @@ export default function ({ getService }) {
     await retry.try(async () => {
       await testSubjects.waitForDeleted('visLoadingIndicator');
     });
-    await delay(1000);
   }
 
   async function getTableData() {

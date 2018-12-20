@@ -25,7 +25,7 @@ import html from '../index.html';
 import uiRoutes from 'ui/routes';
 import { uiModules } from 'ui/modules';
 import { timefilter } from 'ui/timefilter';
-import { getRootBreadcrumbs } from '../../discover/breadcrumbs';
+
 
 const app = uiModules.get('apps/doc', [
   'kibana/notify',
@@ -40,28 +40,18 @@ const resolveIndexPattern = {
   }
 };
 
-const k7Breadcrumbs = ($route) => [
-  ...getRootBreadcrumbs(),
-  {
-    text: `${$route.current.params.index}#${$route.current.params.id}`
-  }
-];
-
 uiRoutes
   .when('/doc/:indexPattern/:index/:type/:id', {
     template: html,
-    resolve: resolveIndexPattern,
-    k7Breadcrumbs
+    resolve: resolveIndexPattern
   })
   .when('/doc/:indexPattern/:index/:type', {
     template: html,
-    resolve: resolveIndexPattern,
-    k7Breadcrumbs
+    resolve: resolveIndexPattern
   });
 
-app.controller('doc', function ($scope, $route, es, config) {
+app.controller('doc', function ($scope, $route, es) {
 
-  config.bindToScope($scope, 'k7design');
   timefilter.disableAutoRefreshSelector();
   timefilter.disableTimeRangeSelector();
 

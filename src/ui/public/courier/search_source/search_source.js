@@ -71,7 +71,7 @@
 
 import _ from 'lodash';
 import angular from 'angular';
-import { buildEsQuery } from '@kbn/es-query';
+import { BuildESQueryProvider } from '@kbn/es-query';
 
 import '../../promises';
 import { NormalizeSortRequestProvider } from './_normalize_sort_request';
@@ -120,6 +120,7 @@ export function SearchSourceProvider(Promise, Private, config) {
   const SegmentedSearchRequest = Private(SegmentedSearchRequestProvider);
   const normalizeSortRequest = Private(NormalizeSortRequestProvider);
   const fetchSoon = Private(FetchSoonProvider);
+  const buildESQuery = Private(BuildESQueryProvider);
   const { fieldWildcardFilter } = Private(FieldWildcardProvider);
   const getConfig = (...args) => config.get(...args);
 
@@ -610,11 +611,7 @@ export function SearchSourceProvider(Promise, Private, config) {
           }
 
           try {
-            const esQueryConfigs = {
-              allowLeadingWildcards: config.get('query:allowLeadingWildcards'),
-              queryStringOptions: config.get('query:queryString:options'),
-            };
-            flatData.body.query = buildEsQuery(flatData.index, flatData.query, flatData.filters, esQueryConfigs);
+            flatData.body.query = buildESQuery(flatData.index, flatData.query, flatData.filters);
           } catch (e) {
             if (e.message === 'OutdatedKuerySyntaxError') {
               throw new OutdatedKuerySyntaxError();

@@ -263,31 +263,6 @@ module.directive('headerGlobalNav', (reactDirective) => {
 
 **NOTE:** To minimize the chance of having multiple `I18nProvider` components in the React tree, try to use `injectI18nProvider` or `I18nProvider` only to wrap the topmost component that you render, e.g. the one that's passed to `reactDirective` or `ReactDOM.render`.
 
-### FormattedRelative
-
-`FormattedRelative` expects several attributes (read more [here](https://github.com/yahoo/react-intl/wiki/Components#formattedrelative)), including
-
-- `value` that can be parsed as a date,
-- `formats` that should be one of `'years' | 'months' | 'days' | 'hours' | 'minutes' | 'seconds'` (this options are configured in [`formats.ts`](./src/core/formats.ts))
--  etc.
-
-If `formats` is not provided then it will be chosen automatically:\
-`x seconds ago` for `x < 60`, `1 minute ago` for `60 <= x < 120`, etc.
-
-```jsx
-<FormattedRelative
-  value={Date.now() - 90000}
-  format="seconds"
-/>
-```
-Initial result: `90 seconds ago`
-```jsx
-<FormattedRelative
-  value={Date.now() - 90000}
-/>
-```
-Initial result: `1 minute ago`
-
 ### Attributes translation in React
 
 React wrapper provides an ability to inject the imperative formatting API into a React component via its props using `injectI18n` Higher-Order Component. This should be used when your React component needs to format data to a string value where a React element is not suitable; e.g., a `title` or `aria` attribute. In order to use it you should wrap your component with `injectI18n` Higher-Order Component. The formatting API will be provided to the wrapped component via `props.intl`.

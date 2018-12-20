@@ -31,7 +31,7 @@ describe('plugins/elasticsearch', function () {
     beforeEach(() => {
       config = {
         elasticsearch: {
-          url: 'http://localhost:9200',
+          hosts: ['http://localhost:9200'],
           logQueries: true
         }
       };
@@ -57,7 +57,21 @@ describe('plugins/elasticsearch', function () {
 
       sinon.assert.calledOnce(createCluster);
       expect(createCluster.getCall(0).args[0]).to.eql('data');
-      expect(createCluster.getCall(0).args[1].url).to.eql('http://localhost:9200');
+      expect(createCluster.getCall(0).args[1].hosts[0]).to.eql('http://localhost:9200');
+    });
+
+    it('creates the cluster with elasticsearch.tribe config', () => {
+      config.elasticsearch.tribe = {
+        hosts: ['http://localhost:9201']
+      };
+
+      createDataCluster(server);
+
+      const { createCluster } = server.plugins.elasticsearch;
+
+      sinon.assert.calledOnce(createCluster);
+      expect(createCluster.getCall(0).args[0]).to.eql('data');
+      expect(createCluster.getCall(0).args[1].hosts[0]).to.eql('http://localhost:9201');
     });
 
     it('sets client logger for cluster options', () => {
@@ -70,7 +84,7 @@ describe('plugins/elasticsearch', function () {
 
       sinon.assert.calledOnce(createCluster);
       expect(firstCall.args[0]).to.eql('data');
-      expect(firstCall.args[1].url).to.eql('http://localhost:9200');
+      expect(firstCall.args[1].hosts[0]).to.eql('http://localhost:9200');
       expect(logger.tags).to.eql(['data']);
       expect(logger.logQueries).to.eql(true);
     });

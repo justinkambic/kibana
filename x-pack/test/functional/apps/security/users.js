@@ -42,7 +42,6 @@ export default function ({ getService, getPageObjects }) {
       log.debug('actualUsers = %j', users);
       expect(users.Lee.roles).to.eql(['kibana_user']);
       expect(users.Lee.fullname).to.eql('LeeFirst LeeLast');
-      expect(users.Lee.email).to.eql('lee@myEmail.com');
       expect(users.Lee.reserved).to.be(false);
     });
 
@@ -55,7 +54,7 @@ export default function ({ getService, getPageObjects }) {
       log.debug('actualUsers = %j', users);
       expect(users.OptionalUser.roles).to.eql(['']);
       expect(users.OptionalUser.fullname).to.eql('');
-      expect(users.OptionalUser.email).to.eql('');
+      expect(users.OptionalUser.email).not.to.be.defined;
       expect(users.OptionalUser.reserved).to.be(false);
     });
 

@@ -60,10 +60,28 @@ export default function (kibana) {
         startupTimeout: Joi.number().default(5000),
         logQueries: Joi.boolean().default(false),
         ssl: sslSchema,
-        apiVersion: Joi.string().default('master'),
+        apiVersion: Joi.string().default('6.x'),
         healthCheck: Joi.object({
           delay: Joi.number().default(2500)
         }).default(),
+        tribe: Joi.object({
+          sniffOnStart: Joi.boolean().default(false),
+          sniffInterval: Joi.number().allow(false).default(false),
+          sniffOnConnectionFault: Joi.boolean().default(false),
+          hosts: Joi.array().items(Joi.string().uri({ scheme: ['http', 'https'] })).single(),
+          preserveHost: Joi.boolean().default(true),
+          username: Joi.string(),
+          password: Joi.string(),
+          shardTimeout: Joi.number().default(0),
+          requestTimeout: Joi.number().default(30000),
+          requestHeadersWhitelist: Joi.array().items().single().default(DEFAULT_REQUEST_HEADERS),
+          customHeaders: Joi.object().default({}),
+          pingTimeout: Joi.number().default(Joi.ref('requestTimeout')),
+          startupTimeout: Joi.number().default(5000),
+          logQueries: Joi.boolean().default(false),
+          ssl: sslSchema,
+          apiVersion: Joi.string().default('master'),
+        }).default()
       }).default();
     },
 
@@ -110,6 +128,26 @@ export default function (kibana) {
         rename('ssl.cert', 'ssl.certificate'),
         url(),
         sslVerify(),
+        rename('tribe.ssl.ca', 'tribe.ssl.certificateAuthorities'),
+        rename('tribe.ssl.cert', 'tribe.ssl.certificate'),
+        sslVerify('tribe'),
+        (settings = {}, log) => {
+          const tribe = get(settings, 'tribe');
+          if (!tribe) {
+            return;
+          }
+          const deprecatedUrl = get(settings, 'tribe.url');
+          if (deprecatedUrl) {
+            set(settings, 'tribe.hosts', [deprecatedUrl]);
+            unset(settings(tribe.url));
+          }
+          const tribeKeys = Object.keys(tribe);
+          if (tribeKeys.length > 0) {
+            const keyList = tribeKeys.map(k => `"elasticsearch.tribe.${k}"`).join(',');
+            log(`Config keys [${keyList}] are deprecated. Tribe nodes will be removed in 7.0 and should be replaced ` +
+              `with Cross-Cluster-Search.`);
+          }
+        }
       ];
     },
 
@@ -119,6 +157,7 @@ export default function (kibana) {
           esRequestTimeout: options.requestTimeout,
           esShardTimeout: options.shardTimeout,
           esApiVersion: options.apiVersion,
+          esDataIsTribe: get(options, 'tribe.hosts.length') ? true : false,
         };
       }
     },

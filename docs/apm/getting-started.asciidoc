@@ -18,5 +18,5 @@ optionally import the APM dashboards that come with the APM Server. You can use
 these APM-specific visualizations to correlate APM data with other data sources.
 To get the dashboards, click the "Load Kibana objects" button at the bottom of the Getting Started guides for APM in Kibana.
 
-For more setup information, see
-{apm-get-started-ref}/index.html[Getting Started with APM].
+//For more setup information, see
+//{apm-get-started-ref}/index.html[Getting Started with APM].

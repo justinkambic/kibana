@@ -8,7 +8,6 @@ import { getClient } from '../../../../../server/lib/get_client_shield';
 import { AuthScopeService } from '../auth_scope_service';
 import { BasicAuthenticationProvider } from './providers/basic';
 import { SAMLAuthenticationProvider } from './providers/saml';
-import { TokenAuthenticationProvider } from './providers/token';
 import { AuthenticationResult } from './authentication_result';
 import { DeauthenticationResult } from './deauthentication_result';
 import { Session } from './session';
@@ -18,8 +17,7 @@ import { LoginAttempt } from './login_attempt';
 // provider class that can handle specific authentication mechanism.
 const providerMap = new Map([
   ['basic', BasicAuthenticationProvider],
-  ['saml', SAMLAuthenticationProvider],
-  ['token', TokenAuthenticationProvider],
+  ['saml', SAMLAuthenticationProvider]
 ]);
 
 function assertRequest(request) {

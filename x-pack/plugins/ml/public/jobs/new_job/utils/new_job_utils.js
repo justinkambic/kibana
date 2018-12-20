@@ -8,14 +8,16 @@
 
 import _ from 'lodash';
 import $ from 'jquery';
-import { buildEsQuery } from '@kbn/es-query';
+import { BuildESQueryProvider } from '@kbn/es-query';
 import { addItemToRecentlyAccessed } from 'plugins/ml/util/recently_accessed';
 import { mlJobService } from 'plugins/ml/services/job_service';
 
 
 // Provider for creating the items used for searching and job creation.
 // Uses the $route object to retrieve the indexPattern and savedSearch from the url
-export function SearchItemsProvider(Private, $route, config) {
+export function SearchItemsProvider(Private, $route) {
+
+  const buildESQuery = Private(BuildESQueryProvider);
 
   function createSearchItems() {
     let indexPattern = $route.current.locals.indexPattern;
@@ -49,11 +51,8 @@ export function SearchItemsProvider(Private, $route, config) {
       if (fs.length) {
         filters = fs;
       }
-      const esQueryConfigs = {
-        allowLeadingWildcards: config.get('query:allowLeadingWildcards'),
-        queryStringOptions: config.get('query:queryString:options'),
-      };
-      combinedQuery = buildEsQuery(indexPattern, [query], filters, esQueryConfigs);
+
+      combinedQuery = buildESQuery(indexPattern, [query], filters);
     }
 
     return {

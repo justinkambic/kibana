@@ -18,58 +18,11 @@
  */
 
 import Joi from 'joi';
-import {
-  constants as cryptoConstants
-} from 'crypto';
+import { constants as cryptoConstants } from 'crypto';
 import os from 'os';
 
-import {
-  fromRoot
-} from '../../utils';
-import {
-  getData
-} from '../path';
-
-const tilemapSchema = Joi.object({
-  url: Joi.string(),
-  options: Joi.object({
-    attribution: Joi.string(),
-    minZoom: Joi.number().min(0, 'Must be 0 or higher').default(0),
-    maxZoom: Joi.number().default(10),
-    tileSize: Joi.number(),
-    subdomains: Joi.array().items(Joi.string()).single(),
-    errorTileUrl: Joi.string().uri(),
-    tms: Joi.boolean(),
-    reuseTiles: Joi.boolean(),
-    bounds: Joi.array().items(Joi.array().items(Joi.number()).min(2).required()).min(2),
-    default: Joi.boolean()
-  }).default({
-    default: true
-  })
-}).default();
-
-const regionmapSchema = Joi.object({
-  includeElasticMapsService: Joi.boolean().default(true),
-  layers: Joi.array().items(Joi.object({
-    url: Joi.string(),
-    format: Joi.object({
-      type: Joi.string().default('geojson')
-    }).default({
-      type: 'geojson'
-    }),
-    meta: Joi.object({
-      feature_collection_path: Joi.string().default('data')
-    }).default({
-      feature_collection_path: 'data'
-    }),
-    attribution: Joi.string(),
-    name: Joi.string(),
-    fields: Joi.array().items(Joi.object({
-      name: Joi.string(),
-      description: Joi.string()
-    }))
-  })).default([])
-}).default();
+import { fromRoot } from '../../utils';
+import { getData } from '../path';
 
 export default () => Joi.object({
   pkg: Joi.object({
@@ -138,7 +91,7 @@ export default () => Joi.object({
       }),
       keyPassphrase: Joi.string(),
       certificateAuthorities: Joi.array().single().items(Joi.string()).default([]),
-      supportedProtocols: Joi.array().items(Joi.string().valid('TLSv1', 'TLSv1.1', 'TLSv1.2')).default(['TLSv1.1', 'TLSv1.2']),
+      supportedProtocols: Joi.array().items(Joi.string().valid('TLSv1', 'TLSv1.1', 'TLSv1.2')),
       cipherSuites: Joi.array().items(Joi.string()).default(cryptoConstants.defaultCoreCipherList.split(':'))
     }).default(),
     cors: Joi.when('$dev', {
@@ -177,6 +130,7 @@ export default () => Joi.object({
         then: Joi.valid(false).default(false),
         otherwise: Joi.default(false)
       }),
+
     events: Joi.any().default({}),
     dest: Joi.string().default('stdout'),
     filter: Joi.any().default({}),
@@ -237,15 +191,46 @@ export default () => Joi.object({
     allowAnonymous: Joi.boolean().default(false)
   }).default(),
   map: Joi.object({
-    includeElasticMapsService: Joi.boolean().default(true),
-    tilemap: tilemapSchema,
-    regionmap: regionmapSchema,
-    // manifestServiceUrl: Joi.string().default(' https://catalogue.maps.elastic.co/v2/manifest'),
     manifestServiceUrl: Joi.string().default('https://catalogue-staging.maps.elastic.co/v6.6/manifest'),
     emsLandingPageUrl: Joi.string().default('https://maps.elastic.co/v2'),
+    includeElasticMapsService: Joi.boolean().default(true)
   }).default(),
-  tilemap: tilemapSchema.notes('Deprecated'),
-  regionmap: regionmapSchema.notes('Deprecated'),
+  tilemap: Joi.object({
+    url: Joi.string(),
+    options: Joi.object({
+      attribution: Joi.string(),
+      minZoom: Joi.number().min(0, 'Must be 0 or higher').default(0),
+      maxZoom: Joi.number().default(10),
+      tileSize: Joi.number(),
+      subdomains: Joi.array().items(Joi.string()).single(),
+      errorTileUrl: Joi.string().uri(),
+      tms: Joi.boolean(),
+      reuseTiles: Joi.boolean(),
+      bounds: Joi.array().items(Joi.array().items(Joi.number()).min(2).required()).min(2)
+    }).default()
+  }).default(),
+  regionmap: Joi.object({
+    includeElasticMapsService: Joi.boolean().default(true),
+    layers: Joi.array().items(Joi.object({
+      url: Joi.string(),
+      format: Joi.object({
+        type: Joi.string().default('geojson')
+      }).default({
+        type: 'geojson'
+      }),
+      meta: Joi.object({
+        feature_collection_path: Joi.string().default('data')
+      }).default({
+        feature_collection_path: 'data'
+      }),
+      attribution: Joi.string(),
+      name: Joi.string(),
+      fields: Joi.array().items(Joi.object({
+        name: Joi.string(),
+        description: Joi.string()
+      }))
+    }))
+  }).default(),
 
   i18n: Joi.object({
     locale: Joi.string().default('en'),

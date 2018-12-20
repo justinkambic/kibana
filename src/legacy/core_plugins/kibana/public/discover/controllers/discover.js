@@ -64,7 +64,6 @@ import { showOpenSearchPanel } from '../top_nav/show_open_search_panel';
 import { tabifyAggResponse } from 'ui/agg_response/tabify';
 import { showSaveModal } from 'ui/saved_objects/show_saved_object_save_modal';
 import { SavedObjectSaveModal } from 'ui/saved_objects/components/saved_object_save_modal';
-import { getRootBreadcrumbs, getSavedSearchBreadcrumbs } from '../breadcrumbs';
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
@@ -74,14 +73,8 @@ const app = uiModules.get('apps/discover', [
 ]);
 
 uiRoutes
-  .defaults(/^\/discover(\/|$)/, {
-    requireDefaultIndex: true,
-    k7Breadcrumbs: ($route, $injector) =>
-      $injector.invoke(
-        $route.current.params.id
-          ? getSavedSearchBreadcrumbs
-          : getRootBreadcrumbs
-      )
+  .defaults(/discover/, {
+    requireDefaultIndex: true
   })
   .when('/discover/:id?', {
     template: indexTemplate,
@@ -190,8 +183,6 @@ function discoverController(
   $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
   };
-
-  config.bindToScope($scope, 'k7design');
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
@@ -761,7 +752,7 @@ function discoverController(
         Promise
           .resolve(responseHandler(tabifiedData))
           .then(resp => {
-            visualizeHandler.render({ value: resp });
+            visualizeHandler.render(resp);
           });
       }
 

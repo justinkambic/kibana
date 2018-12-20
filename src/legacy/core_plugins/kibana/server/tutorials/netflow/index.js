@@ -41,6 +41,15 @@ This module support Netflow Version 5 and 9. [Learn more]({linkUrl}).',
         linkUrl: '{config.docs.logstash}/netflow-module.html',
       },
     }),
+    artifacts: {
+      dashboards: [
+        {
+          id: '653cf1e0-2fd2-11e7-99ed-49759aed30f5', // Taken from https://github.com/elastic/logstash/blob/master/modules/netflow/configuration/kibana/6.x/dashboard/653cf1e0-2fd2-11e7-99ed-49759aed30f5.json
+          linkLabel: 'Netflow: Overview dashboard',
+          isOverview: true
+        }
+      ]
+    },
     completionTimeMinutes: 10,
     //previewImagePath: 'kibana-apache.png', TODO
     onPrem: createOnPremInstructions(),

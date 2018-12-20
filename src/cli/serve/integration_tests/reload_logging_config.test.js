@@ -31,15 +31,13 @@ import { getConfigFromFiles } from '../../../core/server/config/read_config';
 const testConfigFile = follow('__fixtures__/reload_logging_config/kibana.test.yml');
 const kibanaPath = follow('../../../../scripts/kibana.js');
 
-const second = 1000;
-const minute = second * 60;
-
-const tempDir = path.join(os.tmpdir(), 'kbn-reload-test');
-
-
 function follow(file) {
   return path.relative(process.cwd(), path.resolve(__dirname, file));
 }
+
+const second = 1000;
+const minute = second * 60;
+const tempDir = path.join(os.tmpdir(), 'kbn-reload-test');
 
 function setLoggingJson(enabled) {
   const conf = getConfigFromFiles([testConfigFile]);

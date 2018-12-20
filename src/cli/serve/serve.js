@@ -55,9 +55,6 @@ function isSymlinkTo(link, dest) {
 const CLUSTER_MANAGER_PATH = resolve(__dirname, '../cluster/cluster_manager');
 const CAN_CLUSTER = canRequire(CLUSTER_MANAGER_PATH);
 
-const REPL_PATH = resolve(__dirname, '../repl');
-const CAN_REPL = canRequire(REPL_PATH);
-
 // xpack is installed in both dev and the distributable, it's optional if
 // install is a link to the source, not an actual install
 const XPACK_INSTALLED_DIR = resolve(__dirname, '../../../node_modules/x-pack');
@@ -179,10 +176,6 @@ export default function (program) {
     .option('--optimize', 'Optimize and then stop the server');
 
 
-  if (CAN_REPL) {
-    command.option('--repl', 'Run the server with a REPL prompt and access to the server object');
-  }
-
   if (XPACK_OPTIONAL) {
     command
       .option('--oss', 'Start Kibana without X-Pack');
@@ -220,7 +213,6 @@ export default function (program) {
           quiet: !!opts.quiet,
           silent: !!opts.silent,
           watch: !!opts.watch,
-          repl: !!opts.repl,
           basePath: !!opts.basePath,
           optimize: !!opts.optimize,
         },
@@ -228,7 +220,6 @@ export default function (program) {
           isClusterModeSupported: CAN_CLUSTER,
           isOssModeSupported: XPACK_OPTIONAL,
           isXPackInstalled: XPACK_INSTALLED,
-          isReplModeSupported: CAN_REPL,
         },
         applyConfigOverrides: rawConfig => applyConfigOverrides(rawConfig, opts, unknownOptions),
       });

@@ -117,7 +117,7 @@ export default function ({ getService, getPageObjects }) {
       await PageObjects.dashboard.saveDashboard('embeddable rendering test', { storeTimeWithDashboard: true });
     });
 
-    it.skip('initial render test', async () => {
+    it('initial render test', async () => {
       await expectAllDataRenders();
     });
 

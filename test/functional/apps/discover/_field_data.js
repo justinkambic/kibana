@@ -24,7 +24,7 @@ export default function ({ getService, getPageObjects }) {
   const esArchiver = getService('esArchiver');
   const kibanaServer = getService('kibanaServer');
   const queryBar = getService('queryBar');
-  const PageObjects = getPageObjects(['common', 'header', 'discover', 'visualize']);
+  const PageObjects = getPageObjects(['common', 'header', 'discover']);
 
   describe('discover tab', function describeIndexTests() {
     before(async function () {

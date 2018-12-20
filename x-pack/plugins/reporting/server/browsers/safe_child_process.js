@@ -55,12 +55,3 @@ export function safeChildProcess(childProcess, observer) {
 
   observer.add(terminate$.pipe(ignoreElements()).subscribe(observer));
 }
-
-// If a process exits ungracefully, we can try to help the user make sense of why
-// by giving them a suggestion based on the code.
-export function exitCodeSuggestion(code) {
-  if (code === null) {
-    return 'Your report may be too large. Try removing some visualizations or increasing the RAM available to Kibana.';
-  }
-  return '';
-}
