@@ -4,6 +4,7 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
+import { i18n } from '@kbn/i18n';
 import { ApolloError } from 'apollo-client';
 import { get } from 'lodash';
 import React from 'react';
@@ -42,10 +43,20 @@ export const MonitorStatusBar = ({
   >
     {({ loading, error, data }: MonitorStatusBarQueryParams) => {
       if (loading) {
-        return <EmptyStatusBar message="Fetching data" monitorId={monitorId} />;
+        return (
+          <EmptyStatusBar
+            message={i18n.translate('xpack.uptime.monitorStatusBar.loadingMessage', {
+              defaultMessage: 'Fetching data',
+            })}
+            monitorId={monitorId}
+          />
+        );
       }
       if (error) {
-        return `Error ${error.message}`;
+        return i18n.translate('xpack.uptime.monitorStatusBar.errorMessage', {
+          values: { message: error.message },
+          defaultMessage: 'Error {message}',
+        });
       }
 
       const monitorStatus: Ping[] = get(data, 'monitorStatus');

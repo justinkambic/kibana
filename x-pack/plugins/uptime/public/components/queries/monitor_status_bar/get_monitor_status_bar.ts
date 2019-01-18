@@ -26,10 +26,9 @@ export const createGetMonitorStatusBarQuery = gql`
         duration {
           us
         }
-        scheme
       }
-      tcp {
-        port
+      url {
+        full
       }
     }
   }
