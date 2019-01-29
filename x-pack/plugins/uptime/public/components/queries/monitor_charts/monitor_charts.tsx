@@ -74,55 +74,25 @@ export class MonitorCharts extends React.Component<Props, MonitorChartsState> {
           // TODO: this should not exist in the UI, update the GQL resolver/schema to return
           // an object that contains these series already shaped in the way required by the visualizations.
           const { monitorChartsData } = data;
-          const rttWriteRequestSeries: any[] = [];
-          const rttValidateSeries: any[] = [];
-          const rttContentSeries: any[] = [];
-          const rttResponseSeries: any[] = [];
-          const rttTcpSeries: any[] = [];
           const avgDurationSeries: any[] = [];
           const areaRttSeries: any[] = [];
           const downSeries: any[] = [];
           const upSeries: any[] = [];
           const checksSeries: any[] = [];
-          const maxRtt: any[] = [];
-          monitorChartsData.forEach(
-            ({
-              maxWriteRequest,
-              maxValidate,
-              maxContent,
-              maxResponse,
-              maxTcpRtt,
-              avgDuration,
-              maxDuration,
-              minDuration,
-              status,
-            }: any) => {
-              // We're summing these values because we need to know what the max value of the RTT
-              // fields are in order to provide an accurate domain size for the RTT combination series.
-              maxRtt.push({
-                x: maxWriteRequest.x,
-                y: maxWriteRequest.y + maxValidate.y + maxContent.y + maxResponse.y + maxTcpRtt.y,
-              });
-              // TODO: these types of computations should take place on the server and be reflected in the GQL schema
-              rttWriteRequestSeries.push(maxWriteRequest);
-              rttValidateSeries.push(maxValidate);
-              rttContentSeries.push(maxContent);
-              rttResponseSeries.push(maxResponse);
-              rttTcpSeries.push(maxTcpRtt);
-              avgDurationSeries.push(avgDuration);
-              areaRttSeries.push({ x: minDuration.x, y0: minDuration.y, y: maxDuration.y });
-              downSeries.push({ x: status.x, y: status.down });
-              upSeries.push({ x: status.x, y: status.up });
-              checksSeries.push({ x: status.x, y: status.total });
-            }
-          );
+          monitorChartsData.forEach(({ avgDuration, maxDuration, minDuration, status }: any) => {
+            avgDurationSeries.push(avgDuration);
+            areaRttSeries.push({ x: minDuration.x, y0: minDuration.y, y: maxDuration.y });
+            downSeries.push({ x: status.x, y: status.down });
+            upSeries.push({ x: status.x, y: status.up });
+            checksSeries.push({ x: status.x, y: status.total });
+          });
 
           // As above, we are building a domain size for the chart to use.
           // Without this code the chart could render data outside of the field.
           const checksDomain = upSeries.concat(downSeries).map(({ y }) => y);
-          const domainLimits = [Math.min(...checksDomain), Math.max(...checksDomain)];
+          const checkDomainLimits = [0, Math.max(...checksDomain)];
           const durationDomain = avgDurationSeries.concat(areaRttSeries);
-          const durationLimits = [0, Math.max(...durationDomain.map(({ y }) => y))];
+          const durationDomainLimits = [0, Math.max(...durationDomain.map(({ y }) => y))];
 
           return (
             <Fragment>
@@ -144,7 +114,7 @@ export class MonitorCharts extends React.Component<Props, MonitorChartsState> {
                       width={500}
                       height={200}
                       xType={EuiSeriesChartUtils.SCALE.TIME}
-                      yDomain={durationLimits}
+                      yDomain={durationDomainLimits}
                       crosshairValue={this.state.crosshairLocation}
                       onCrosshairUpdate={this.updateCrosshairLocation}
                     >
@@ -188,7 +158,7 @@ export class MonitorCharts extends React.Component<Props, MonitorChartsState> {
                       stackBy="y"
                       crosshairValue={this.state.crosshairLocation}
                       onCrosshairUpdate={this.updateCrosshairLocation}
-                      yDomain={domainLimits}
+                      yDomain={checkDomainLimits}
                     >
                       <EuiAreaSeries
                         name={i18n.translate(
