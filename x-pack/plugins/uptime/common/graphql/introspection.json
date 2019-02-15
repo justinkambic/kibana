@@ -407,10 +407,10 @@
             "deprecationReason": null
           },
           {
-            "name": "millisFromNow",
-            "description": "Milliseconds from the timestamp to the current time",
+            "name": "fromNowString",
+            "description": "A string expressing the amount of time elapsed since the document was created",
             "args": [],
-            "type": { "kind": "SCALAR", "name": "Int", "ofType": null },
+            "type": { "kind": "SCALAR", "name": "String", "ofType": null },
             "isDeprecated": false,
             "deprecationReason": null
           },

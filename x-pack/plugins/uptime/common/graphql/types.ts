@@ -42,8 +42,8 @@ export interface PingResults {
 export interface Ping {
   /** The timestamp of the ping's creation */
   timestamp: string;
-  /** Milliseconds from the timestamp to the current time */
-  millisFromNow?: number | null;
+  /** A string expressing the amount of time elapsed since the document was created */
+  fromNowString?: string | null;
   /** The agent that recorded the ping */
   beat?: Beat | null;
 

@@ -79,7 +79,6 @@ export class ElasticsearchPingsAdapter implements UMPingsAdapter {
     }
     const params = {
       index: INDEX_NAMES.HEARTBEAT,
-      rest_total_hits_as_int: true,
       body: {
         query: {
           bool: {
@@ -124,12 +123,11 @@ export class ElasticsearchPingsAdapter implements UMPingsAdapter {
     // @ts-ignore TODO fix destructuring implicit any
     return buckets.map(({ latest: { hits: { hits } } }) => {
       const timestamp = hits[0]._source[`@timestamp`];
-      const momentTs = moment(timestamp);
-      const millisFromNow = moment().diff(momentTs);
+      const fromNowString = moment(timestamp).fromNow();
       return {
         ...hits[0]._source,
         timestamp,
-        millisFromNow,
+        fromNowString,
       };
     });
   }

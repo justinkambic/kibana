@@ -184,8 +184,8 @@ export const pingsSchema = gql`
   type Ping {
     "The timestamp of the ping's creation"
     timestamp: String!
-    "Milliseconds from the timestamp to the current time"
-    millisFromNow: Int64
+    "A string expressing the amount of time elapsed since the document was created"
+    fromNowString: String
     "The agent that recorded the ping"
     beat: Beat
     docker: Docker
