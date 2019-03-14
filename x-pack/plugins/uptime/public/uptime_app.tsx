@@ -44,6 +44,7 @@ export interface UptimeCommonProps {
   colors: UptimeAppColors;
   dateRangeStart: string;
   dateRangeEnd: string;
+  lastForceRefresh?: number;
   setBreadcrumbs: UMUpdateBreadcrumbs;
   setHeadingText: (text: string) => void;
 }
@@ -76,6 +77,7 @@ interface UptimeAppState {
   dateRangeStart: string;
   dateRangeEnd: string;
   headingText?: string;
+  lastForceRefresh?: number;
 }
 
 // TODO: when EUI exports types for this, this should be replaced
@@ -162,6 +164,7 @@ class Application extends React.Component<UptimeAppProps, UptimeAppState> {
                           { dateRangeStart: start, dateRangeEnd: end },
                           this.persistState
                         );
+                        this.setState({ lastForceRefresh: Date.now() });
                       }}
                       onRefreshChange={({
                         isPaused,

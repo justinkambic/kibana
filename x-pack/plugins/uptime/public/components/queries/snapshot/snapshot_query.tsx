@@ -46,6 +46,7 @@ export class SnapshotQuery extends React.Component<Props, SnapshotQueryState> {
       dateRangeStart,
       dateRangeEnd,
       filters,
+      lastForceRefresh,
     } = this.props;
 
     return (
@@ -54,7 +55,7 @@ export class SnapshotQuery extends React.Component<Props, SnapshotQueryState> {
         query={getSnapshotQuery}
         variables={{ dateRangeStart, dateRangeEnd, filters }}
       >
-        {({ loading, error, data }) => {
+        {({ loading, error, data, refetch }) => {
           if (loading) {
             return <SnapshotLoading />;
           }
@@ -63,6 +64,9 @@ export class SnapshotQuery extends React.Component<Props, SnapshotQueryState> {
               values: { message: error.message },
               defaultMessage: 'Error {message}',
             });
+          }
+          if (lastForceRefresh && Date.now() > lastForceRefresh) {
+            refetch({ dateRangeStart, dateRangeEnd, filters });
           }
           const { snapshot }: { snapshot: SnapshotType } = data;
 
