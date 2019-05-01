@@ -46,6 +46,7 @@ export const UptimePageProvider = ({
       await pageObjects.common.navigateToApp('uptime');
       await pageObjects.timePicker.setAbsoluteRange(datePickerStartValue, datePickerEndValue);
       await uptimeService.setFilterText(filterQuery);
+      await new Promise(r => setTimeout(r, 3000));
       await uptimeService.monitorIdExists('monitor-page-link-auto-http-0X131221E73F825974');
     }
   }();
