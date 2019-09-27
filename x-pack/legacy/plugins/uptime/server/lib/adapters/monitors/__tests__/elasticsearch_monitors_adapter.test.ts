@@ -14,6 +14,7 @@ const assertCloseTo = (actual: number, expected: number, precision: number) => {
     throw new Error(`expected [${actual}] to be within ${precision} of ${actual}`);
   }
 };
+import filterResult from './filter_result.json';
 
 // FIXME: there are many untested functions in this adapter. They should be tested.
 describe('ElasticsearchMonitorsAdapter', () => {
@@ -29,6 +30,20 @@ describe('ElasticsearchMonitorsAdapter', () => {
         skipped: 0,
       },
     };
+  });
+
+  it('will return filter data for each expected field', async () => {
+    const searchMock = jest.fn();
+    searchMock.mockReturnValue({ aggregations: filterResult });
+    const database = {
+      search: searchMock,
+      count: jest.fn(),
+      head: jest.fn(),
+    };
+    const adapter = new ElasticsearchMonitorsAdapter(database);
+    const filters = await adapter.getFilterBar({}, 'now-3w', 'now-2h');
+    expect(searchMock).toHaveBeenCalled();
+    expect(filters).toMatchSnapshot();
   });
 
   it('getMonitorChartsData will run expected parameters when no location is specified', async () => {
