@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 import * as t from 'io-ts';
-import { CheckGeoType, SummaryType } from '../common';
+import { CheckGeoType, SummaryType } from './common';
 
 // IO type for validation
 export const MonitorLocationType = t.partial({

@@ -6,12 +6,13 @@
 
 import React, { Fragment } from 'react';
 import { i18n } from '@kbn/i18n';
-import { UptimeGraphQLQueryProps, withUptimeGraphQL } from '../../higher_order';
-import { docCountQuery } from '../../../queries';
+import { connect } from 'react-redux';
+import { UptimeGraphQLQueryProps } from '../../higher_order';
 import { EmptyStateError } from './empty_state_error';
 import { EmptyStateLoading } from './empty_state_loading';
 import { StatesIndexStatus } from '../../../../common/graphql/types';
 import { DataMissing } from './data_missing';
+import { AppState } from '../../../state';
 
 interface EmptyStateQueryResult {
   statesIndexStatus?: StatesIndexStatus;
@@ -61,7 +62,11 @@ export const EmptyStateComponent = ({ basePath, children, data, errors }: Props)
   return <EmptyStateLoading />;
 };
 
-export const EmptyState = withUptimeGraphQL<EmptyStateQueryResult, EmptyStateProps>(
-  EmptyStateComponent,
-  docCountQuery
-);
+// @ts-ignore delete this comment
+export const Container: React.FC<Props> = () => {};
+
+const mapStateToProps = (state: AppState) => {};
+
+const mapDispatchToProps = (dispatch: any) => {};
+
+export const Comp = connect(mapStateToProps, mapDispatchToProps)(Container);

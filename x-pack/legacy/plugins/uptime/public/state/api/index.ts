@@ -4,5 +4,6 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
+export * from './index_status';
 export * from './monitor';
 export * from './snapshot';

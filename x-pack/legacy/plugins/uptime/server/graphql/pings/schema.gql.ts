@@ -38,9 +38,6 @@ export const pingsSchema = gql`
       "Optional: agent location to filter by."
       location: String
     ): PingResults!
-
-    "Gets the number of documents in the target index"
-    getDocCount: DocCount!
   }
 
   type ContainerImage {
@@ -53,10 +50,6 @@ export const pingsSchema = gql`
     image: ContainerImage
     name: String
     runtime: String
-  }
-
-  type DocCount {
-    count: UnsignedInteger!
   }
 
   "The monitor's status for a ping"
