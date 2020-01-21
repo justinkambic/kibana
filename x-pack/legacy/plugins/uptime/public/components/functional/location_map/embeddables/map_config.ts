@@ -5,7 +5,7 @@
  */
 
 import lowPolyLayerFeatures from './low_poly_layer.json';
-import { LocationPoint } from './embedded_map.js';
+import { LocationPoint } from './embedded_map';
 import { UptimeAppColors } from '../../../../uptime_app';
 
 /**
