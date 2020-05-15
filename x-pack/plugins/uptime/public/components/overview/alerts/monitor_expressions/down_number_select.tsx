@@ -10,12 +10,17 @@ import * as labels from '../translations';
 import { AlertFieldNumber } from '../alert_field_number';
 
 interface Props {
+  defaultValue?: number;
   setAlertParams: (key: string, value: any) => void;
   filters: string;
 }
 
-export const DownNoExpressionSelect: React.FC<Props> = ({ filters, setAlertParams }) => {
-  const [numTimes, setNumTimes] = useState<number>(5);
+export const DownNoExpressionSelect: React.FC<Props> = ({
+  defaultValue,
+  filters,
+  setAlertParams,
+}) => {
+  const [numTimes, setNumTimes] = useState<number>(defaultValue || 5);
 
   useEffect(() => {
     setAlertParams('numTimes', numTimes);

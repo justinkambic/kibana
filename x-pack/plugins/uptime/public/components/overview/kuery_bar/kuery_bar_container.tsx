@@ -6,15 +6,21 @@
 
 import { connect } from 'react-redux';
 import { AppState } from '../../../state';
-import { selectIndexPattern } from '../../../state/selectors';
-import { getIndexPattern } from '../../../state/actions';
+import { selectIndexPattern, filterGroupDataSelector } from '../../../state/selectors';
+import { getIndexPattern, setEsKueryString } from '../../../state/actions';
 import { KueryBarComponent } from './kuery_bar';
 
-const mapStateToProps = (state: AppState) => ({ ...selectIndexPattern(state) });
+const mapStateToProps = (state: AppState) => ({
+  ...selectIndexPattern(state),
+  ...filterGroupDataSelector(state),
+});
 
 const mapDispatchToProps = (dispatch: any) => ({
   loadIndexPattern: () => {
     dispatch(getIndexPattern({}));
+  },
+  updateEsKuery: (value: string) => {
+    dispatch(setEsKueryString(value));
   },
 });
 

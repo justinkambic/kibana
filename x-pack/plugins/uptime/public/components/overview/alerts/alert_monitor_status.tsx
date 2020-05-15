@@ -31,13 +31,20 @@ interface AlertMonitorStatusProps {
 }
 
 export const AlertMonitorStatusComponent: React.FC<AlertMonitorStatusProps> = props => {
-  const { filters, setAlertParams } = props;
+  const alertParams = props;
+  // const {
+  //   alertParams: {
+  //     numTimes,
+  //     timerange: { from },
+  //   },
+  // } = props;
+  const { esKuery, filters, setAlertParams } = props;
 
   const [newFilters, setNewFilters] = useState<string[]>([]);
 
   useEffect(() => {
-    setAlertParams('filters', filters);
-  }, [filters, setAlertParams]);
+    setAlertParams('filters', esKuery || filters);
+  }, [esKuery, filters, setAlertParams]);
 
   return (
     <>
@@ -50,11 +57,18 @@ export const AlertMonitorStatusComponent: React.FC<AlertMonitorStatusProps> = pr
 
       <EuiSpacer size="s" />
 
-      <DownNoExpressionSelect filters={filters} setAlertParams={setAlertParams} />
+      <DownNoExpressionSelect
+        defaultValue={alertParams?.numTimes}
+        filters={filters}
+        setAlertParams={setAlertParams}
+      />
 
       <EuiSpacer size="xs" />
 
-      <TimeExpressionSelect setAlertParams={setAlertParams} />
+      <TimeExpressionSelect
+        defaultValue={alertParams?.timerange?.from}
+        setAlertParams={setAlertParams}
+      />
 
       <EuiSpacer size="xs" />
 

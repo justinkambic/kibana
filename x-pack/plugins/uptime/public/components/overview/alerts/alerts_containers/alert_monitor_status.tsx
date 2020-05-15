@@ -4,11 +4,12 @@
  * you may not use this file except in compliance with the Elastic License.
  */
 
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { DataPublicPluginSetup } from 'src/plugins/data/public';
-import { selectMonitorStatusAlert } from '../../../../state/selectors';
+import { selectMonitorStatusAlert, filterGroupDataSelector } from '../../../../state/selectors';
 import { AlertMonitorStatusComponent } from '../index';
+import { setEsKueryString } from '../../../../state/actions';
 
 interface Props {
   autocomplete: DataPublicPluginSetup['autocomplete'];
@@ -21,23 +22,16 @@ interface Props {
   };
 }
 
-export const AlertMonitorStatus = ({
-  autocomplete,
-  enabled,
-  numTimes,
-  setAlertParams,
-  timerange,
-}: Props) => {
+export const AlertMonitorStatus = (props: Props) => {
   const { filters, locations } = useSelector(selectMonitorStatusAlert);
+  const { esKuery } = useSelector(filterGroupDataSelector);
+
   return (
     <AlertMonitorStatusComponent
-      autocomplete={autocomplete}
-      enabled={enabled}
+      esKuery={esKuery}
       filters={filters}
       locations={locations}
-      numTimes={numTimes}
-      setAlertParams={setAlertParams}
-      timerange={timerange}
+      {...props}
     />
   );
 };

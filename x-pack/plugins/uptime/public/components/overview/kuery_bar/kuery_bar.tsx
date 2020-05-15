@@ -41,14 +41,15 @@ interface Props {
   loading: boolean;
 }
 
-export function KueryBarComponent({
-  'aria-label': ariaLabel,
-  autocomplete: autocompleteService,
-  'data-test-subj': dataTestSubj,
-  loadIndexPattern,
-  indexPattern,
-  loading,
-}: Props) {
+export function KueryBarComponent(props: Props) {
+  const {
+    'aria-label': ariaLabel,
+    autocomplete: autocompleteService,
+    'data-test-subj': dataTestSubj,
+    loadIndexPattern,
+    indexPattern,
+    loading,
+  } = props;
   useEffect(() => {
     if (!indexPattern) {
       loadIndexPattern();
@@ -115,6 +116,7 @@ export function KueryBarComponent({
       }
 
       updateUrlParams({ search: inputValue.trim() });
+      props.updateEsKuery(JSON.stringify(res, null, 2));
     } catch (e) {
       console.log('Invalid kuery syntax'); // eslint-disable-line no-console
     }

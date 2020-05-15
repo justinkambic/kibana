@@ -13,8 +13,42 @@ import { AlertFieldNumber } from '../alert_field_number';
 import { timeExpLabels } from './translations';
 
 interface Props {
+  defaultValue?: string;
   setAlertParams: (key: string, value: any) => void;
 }
+
+interface AtomicTimeSelection {
+  quantity: number;
+  unit: string;
+}
+
+export const getDefaultValue = (value: string | undefined): AtomicTimeSelection | null => {
+  if (!value) return null;
+
+  const split = value.split('now-');
+
+  if (split.length !== 2) return null;
+
+  const quantityAndUnit = split[1];
+
+  if (quantityAndUnit.length < 2) return null;
+
+  const finalIndex = quantityAndUnit.length - 1;
+  const unit = quantityAndUnit.charAt(finalIndex);
+
+  if (['s', 'm', 'h', 'd'].indexOf(unit) === -1) return null;
+
+  const quantityString = quantityAndUnit.slice(0, finalIndex);
+  const quantity = parseInt(quantityString, 10);
+
+  // 0 should not be a valid value either
+  if (!quantity) return null;
+
+  return {
+    unit,
+    quantity,
+  };
+};
 
 const TimeRangeOptions = [
   {
@@ -26,7 +60,6 @@ const TimeRangeOptions = [
   {
     'aria-label': labels.MINUTES_TIME_RANGE,
     'data-test-subj': 'xpack.uptime.alerts.monitorStatus.timerangeUnitSelectable.minutesOption',
-    checked: 'on',
     key: 'm',
     label: labels.MINUTES,
   },
@@ -44,10 +77,15 @@ const TimeRangeOptions = [
   },
 ];
 
-export const TimeExpressionSelect: React.FC<Props> = ({ setAlertParams }) => {
-  const [numUnits, setNumUnits] = useState<number>(15);
+export const TimeExpressionSelect: React.FC<Props> = ({ defaultValue, setAlertParams }) => {
+  const defaults = getDefaultValue(defaultValue);
+  const [numUnits, setNumUnits] = useState<number>(defaults?.quantity || 15);
 
-  const [timerangeUnitOptions, setTimerangeUnitOptions] = useState<any[]>(TimeRangeOptions);
+  const [timerangeUnitOptions, setTimerangeUnitOptions] = useState<any[]>(
+    TimeRangeOptions.map(opt =>
+      opt.key === defaults?.unit ?? 'm' ? { ...opt, checked: 'on' } : opt
+    )
+  );
 
   useEffect(() => {
     const timerangeUnit = timerangeUnitOptions.find(({ checked }) => checked === 'on')?.key ?? 'm';
