@@ -5,13 +5,14 @@
  */
 
 import React, { ReactElement } from 'react';
-import { render as reactRender } from '@testing-library/react';
+import { render as reactRender, RenderOptions } from '@testing-library/react';
 import { Router } from 'react-router-dom';
 import { MemoryHistory } from 'history/createMemoryHistory';
 import { createMemoryHistory, History } from 'history';
 import { I18nProvider } from '@kbn/i18n/react';
 import { mountWithIntl, renderWithIntl, shallowWithIntl } from '@kbn/test/jest';
 import { coreMock } from 'src/core/public/mocks';
+import { CoreStart } from 'kibana/public';
 import {
   KibanaContextProvider,
   KibanaServices,
@@ -24,7 +25,7 @@ interface KibanaProps {
 }
 
 interface KibanaProviderOptions {
-  coreOptions?: any;
+  coreOptions?: Partial<CoreStart>;
   kibanaProps?: KibanaProps;
 }
 
@@ -38,16 +39,17 @@ interface MockRouterProps extends MockKibanaProviderProps {
 
 interface RenderRouterOptions extends KibanaProviderOptions {
   history?: History;
-  renderOptions?: any;
-  state?: any;
+  renderOptions?: Omit<RenderOptions, 'queries'>;
+  state?: AppState;
 }
 
 /* default mock core */
 const defaultCore = coreMock.createStart();
-const mockCore: () => any = () => {
-  const core = {
+const mockCore: () => CoreStart = () => {
+  const core: CoreStart = {
     ...defaultCore,
     application: {
+      ...defaultCore.application,
       getUrlForApp: () => '/app/uptime',
       navigateToUrl: jest.fn(),
     },

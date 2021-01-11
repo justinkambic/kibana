@@ -15,9 +15,7 @@ describe('ML JobLink', () => {
       <MLJobLink dateRange={{ to: '', from: '' }} basePath="" monitorId="testMonitor">
         <div>Test link</div>
       </MLJobLink>,
-      {
-        coreOptions: { triggersActionsUi: { getEditAlertFlyout: jest.fn() } },
-      }
+      {}
     );
 
     const jobLink = getByRole('link');
