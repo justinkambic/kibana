@@ -83,8 +83,8 @@ const getCurrentOffset = (item: NetworkItem, zeroOffset: number): number => {
   return offsetValue - zeroOffset;
 };
 
-const getConnectingTime = (connect?: number, ssl?: number) => {
-  if (ssl && connect && ssl > 0) {
+export const getConnectingTime = (connect?: number, ssl?: number): number | undefined => {
+  if (ssl && connect) {
     return connect - ssl;
   } else {
     return connect;
