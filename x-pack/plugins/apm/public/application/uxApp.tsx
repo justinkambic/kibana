@@ -53,7 +53,7 @@ function UxApp() {
     { text: UX_LABEL, href: basePath + '/app/ux' },
     {
       text: i18n.translate('xpack.apm.ux.overview', {
-        defaultMessage: 'Overview',
+        defaultMessage: 'Dashboard',
       }),
     },
   ]);

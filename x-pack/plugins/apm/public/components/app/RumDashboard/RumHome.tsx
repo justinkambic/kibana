@@ -18,7 +18,7 @@ import { UserPercentile } from './UserPercentile';
 import { useBreakPoints } from '../../../hooks/use_break_points';
 
 export const UX_LABEL = i18n.translate('xpack.apm.ux.title', {
-  defaultMessage: 'Dashboard',
+  defaultMessage: 'User experience',
 });
 
 export function RumHome() {
