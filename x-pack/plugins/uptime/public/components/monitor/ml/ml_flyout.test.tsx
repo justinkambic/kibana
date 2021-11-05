@@ -12,11 +12,21 @@ import { CLIENT_DEFAULTS } from '../../../../common/constants';
 import * as redux from 'react-redux';
 import { render } from '../../../lib/helper/rtl_helpers';
 import * as labels from './translations';
+import { withNestedTags } from '../../../../public/lib/helper/rtl_helpers';
 
 describe('ML Flyout component', () => {
   const createJob = () => {};
   const onClose = () => {};
   const { DATE_RANGE_START, DATE_RANGE_END } = CLIENT_DEFAULTS;
+  const defaultContextValue = {
+    isDevMode: true,
+    basePath: '',
+    dateRangeStart: DATE_RANGE_START,
+    dateRangeEnd: DATE_RANGE_END,
+    isApmAvailable: true,
+    isInfraAvailable: true,
+    isLogsAvailable: true,
+  };
 
   beforeEach(() => {
     const spy = jest.spyOn(redux, 'useDispatch');
@@ -32,15 +42,7 @@ describe('ML Flyout component', () => {
     // return false value for no license
     spy1.mockReturnValue(false);
 
-    const value = {
-      isDevMode: true,
-      basePath: '',
-      dateRangeStart: DATE_RANGE_START,
-      dateRangeEnd: DATE_RANGE_END,
-      isApmAvailable: true,
-      isInfraAvailable: true,
-      isLogsAvailable: true,
-    };
+    const value = { ...defaultContextValue };
     const { findByText, findAllByText } = render(
       <UptimeSettingsContext.Provider value={value}>
         <MLFlyoutView
@@ -58,15 +60,7 @@ describe('ML Flyout component', () => {
   });
 
   it('able to create job if valid license is available', async () => {
-    const value = {
-      isDevMode: true,
-      basePath: '',
-      dateRangeStart: DATE_RANGE_START,
-      dateRangeEnd: DATE_RANGE_END,
-      isApmAvailable: true,
-      isInfraAvailable: true,
-      isLogsAvailable: true,
-    };
+    const value = { ...defaultContextValue };
     const { queryByText } = render(
       <UptimeSettingsContext.Provider value={value}>
         <MLFlyoutView
@@ -79,5 +73,32 @@ describe('ML Flyout component', () => {
     );
 
     expect(queryByText(labels.START_TRAIL)).not.toBeInTheDocument();
+  });
+
+  it("shows an alert if users don't have adequate permissions", async () => {
+    const value = { ...defaultContextValue };
+
+    const { queryByText } = render(
+      <UptimeSettingsContext.Provider value={value}>
+        <MLFlyoutView
+          isCreatingJob={false}
+          onClickCreate={createJob}
+          onClose={onClose}
+          canCreateMLJob={false}
+        />
+      </UptimeSettingsContext.Provider>
+    );
+
+    expect(
+      withNestedTags(queryByText)(
+        'You must have Kibana "Machine Learning" privileges to use this feature.'
+      )
+    ).toBeInTheDocument();
+
+    expect(
+      queryByText(
+        `To create an alert for this job, you must have Kibana "Actions and Connectors" privileges.`
+      )
+    ).toBeInTheDocument();
   });
 });

@@ -8,7 +8,12 @@
 import React, { ReactElement } from 'react';
 import { of } from 'rxjs';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { render as reactTestLibRender, RenderOptions } from '@testing-library/react';
+import {
+  render as reactTestLibRender,
+  MatcherFunction,
+  RenderOptions,
+  Nullish,
+} from '@testing-library/react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory, History } from 'history';
 import { CoreStart } from 'kibana/public';
@@ -202,3 +207,23 @@ const getHistoryFromUrl = (url: Url) => {
     initialEntries: [url.path + stringifyUrlParams(url.queryParams)],
   });
 };
+
+// The withNestedTags function performs queries which will ignore inner
+// tags, allowing you to query for text nested in HTML elements.
+//
+// This function allows you to search for the string `I like pizza`
+// when it's in the document as <p>I like <b>pizza</b>, for example.
+//
+// Such functionality is especially useful when dealing
+// with `FormattedMessage` components which interpolate elements
+// within a message.
+export const withNestedTags =
+  (getByText: (f: MatcherFunction) => HTMLElement | null) =>
+  (text: string): HTMLElement | null =>
+    getByText((_content: string, node: Nullish<Element>) => {
+      if (!node) return false;
+      const noOtherChildHasText = Array.from(node.children).every(
+        (child) => child && child.textContent !== text
+      );
+      return node.textContent === text && noOtherChildHasText;
+    });

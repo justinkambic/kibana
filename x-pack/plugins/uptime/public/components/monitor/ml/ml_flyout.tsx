@@ -19,6 +19,7 @@ import {
   EuiSpacer,
   EuiText,
   EuiTitle,
+  EuiCallOut,
 } from '@elastic/eui';
 import { FormattedMessage } from '@kbn/i18n/react';
 import { useSelector } from 'react-redux';
@@ -69,6 +70,26 @@ export function MLFlyoutView({ isCreatingJob, onClickCreate, onClose, canCreateM
           </p>
         </EuiText>
         <EuiSpacer />
+        {!canCreateMLJob && (
+          <EuiCallOut
+            title={labels.ADD_JOB_PERMISSIONS_NEEDED}
+            color="primary"
+            iconType="iInCircle"
+          >
+            <p>
+              <FormattedMessage
+                id="xpack.uptime.ml.enableAnomalyDetectionPanel.insufficient_permissions_add_job"
+                defaultMessage='You must have Kibana "Machine Learning" privileges to use this feature.'
+              />
+            </p>
+            <p>
+              <FormattedMessage
+                id="xpack.uptime.ml.enableAnomalyDetectionPanel.alerts_required_role"
+                defaultMessage='To create an alert for this job, you must have Kibana "Actions and Connectors" privileges.'
+              />
+            </p>
+          </EuiCallOut>
+        )}
       </EuiFlyoutBody>
       <EuiFlyoutFooter>
         <EuiFlexGroup justifyContent="spaceBetween">
