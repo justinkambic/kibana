@@ -12,6 +12,7 @@ import {
   hasMLJobSelector,
   hasNewMLJobSelector,
   isMLJobCreatingSelector,
+  mlCapabilitiesSelector,
   selectDynamicSettings,
 } from '../../../state/selectors';
 import {
@@ -74,6 +75,7 @@ export const MachineLearningFlyout: React.FC<Props> = ({ onClose }) => {
   const { data: hasMLJob, error } = useSelector(hasNewMLJobSelector);
   const isMLJobCreating = useSelector(isMLJobCreatingSelector);
   const { settings } = useSelector(selectDynamicSettings);
+  console.log('ml capabilities', useSelector(mlCapabilitiesSelector));
   useEffect(() => {
     // Attempt to load or refresh the dynamic settings
     dispatch(getDynamicSettings({}));
