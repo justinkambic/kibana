@@ -36,6 +36,7 @@ import { STATUS_ALERT_COLUMN } from './translations';
 import { MonitorNameColumn } from './columns/monitor_name_col';
 import { MonitorTags } from '../../common/monitor_tags';
 import { useMonitorHistogram } from './use_monitor_histogram';
+import { useKibana } from '../../../../../../../src/plugins/kibana_react/public';
 
 interface Props extends MonitorListProps {
   pageSize: number;
@@ -65,6 +66,16 @@ export const MonitorListComponent: ({
     50,
     [width]
   );
+
+  const { services } = useKibana();
+  let actionsEnabled: boolean = false;
+  const actionsCapabilities = services.application?.capabilities.actions;
+  if (actionsCapabilities) {
+    const { delete: d, execute, save, show } = actionsCapabilities;
+    actionsEnabled =
+      (d as boolean) && (execute as boolean) && (save as boolean) && (show as boolean);
+  }
+  console.log('actions enabled', actionsEnabled);
 
   const items = list.summaries ?? [];
 
