@@ -7,11 +7,11 @@
 
 import React from 'react';
 import datemath from '@kbn/datemath';
-import { useEsSearch } from '@kbn/observability-plugin/public';
 import { serviceNameQuery } from '../../../../services/data/service_name_query';
 import { ServiceNameFilter } from '../url_filter/service_name_filter';
 import { useLegacyUrlParams } from '../../../../context/url_params_context/use_url_params';
 import { useDataView } from '../local_uifilters/use_data_view';
+import { useCachedRequests } from '../../../../services/rest/call_api';
 
 function callDateMath(value: unknown): number {
   const DEFAULT_RETURN_VALUE = 0;
@@ -28,14 +28,16 @@ export function WebApplicationSelect() {
   } = useLegacyUrlParams();
   const { dataViewTitle } = useDataView();
 
-  const { data, loading } = useEsSearch(
+  const { data, loading } = useCachedRequests(
     {
       index: dataViewTitle,
       ...serviceNameQuery(callDateMath(start), callDateMath(end)),
     },
     // `rangeId` works as a cache buster for ranges that never change, like `Today`
     [start, end, rangeId, dataViewTitle],
-    { name: 'UxApplicationServices' }
+    { name: 'UxApplicationServices' },
+    start,
+    end
   );
 
   const rumServiceNames =

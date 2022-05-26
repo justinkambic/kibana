@@ -5,11 +5,16 @@
  * 2.0.
  */
 
+import type * as estypes from '@elastic/elasticsearch/lib/api/typesWithBodyKey';
 import { CoreSetup, CoreStart } from '@kbn/core/public';
+import { ESSearchResponse } from '@kbn/core/types/elasticsearch';
+import {
+  enableInspectEsQueries,
+  useEsSearch,
+} from '@kbn/observability-plugin/public';
 import { isString, startsWith } from 'lodash';
 import LRU from 'lru-cache';
 import hash from 'object-hash';
-import { enableInspectEsQueries } from '@kbn/observability-plugin/public';
 import { FetchOptions } from '../../../common/fetch_options';
 
 function fetchOptionsWithDebug(
@@ -39,6 +44,77 @@ export function clearCache() {
 }
 
 export type CallApi = typeof callApi;
+
+function isBSearchCachable<TParams extends estypes.SearchRequest>(
+  start?: string,
+  end?: string,
+  params?: TParams
+) {
+  if (!start && !end && !params) return false;
+
+  return isString(end) && new Date(end).getTime() < Date.now();
+}
+
+function getBSearchRequestCacheKey(options: {
+  params: estypes.SearchRequest;
+  name: string;
+  start?: string;
+  end?: string;
+}) {
+  const { start, end, params, name } = options;
+  if (!start || !end) return null;
+  return hash({ start, end, params, name });
+}
+
+export function useCachedRequests<
+  DocumentSource extends unknown,
+  TParams extends estypes.SearchRequest
+>(
+  params: TParams,
+  fnDeps: any[],
+  options: { name: string },
+  start?: string,
+  end?: string
+) {
+  let cachedResponse:
+    | ESSearchResponse<DocumentSource, TParams, { restTotalHitsAsInt: boolean }>
+    | null
+    | undefined = null;
+
+  const cacheKey = getBSearchRequestCacheKey({
+    params,
+    name: options.name,
+    start,
+    end,
+  });
+  if (cacheKey !== null) {
+    cachedResponse = cache.get(cacheKey);
+  }
+
+  if (cachedResponse) {
+    params.index = undefined;
+  }
+
+  const { data, loading } = useEsSearch<DocumentSource, TParams>(
+    params,
+    fnDeps,
+    options
+  );
+
+  if (
+    !cachedResponse &&
+    data &&
+    cacheKey &&
+    isBSearchCachable(start, end, params)
+  ) {
+    cache.set(cacheKey, data);
+  }
+
+  return {
+    data: cachedResponse ?? data,
+    loading: cachedResponse ? false : loading,
+  };
+}
 
 export async function callApi<T = void>(
   { http, uiSettings }: CoreStart | CoreSetup,
@@ -94,7 +170,7 @@ function isCachable(fetchOptions: FetchOptions) {
   );
 }
 
-// order the options object to make sure that two objects with the same arguments, produce produce the
+// order the options object to make sure that two objects with the same arguments, produce the
 // same cache key regardless of the order of properties
 function getCacheKey(options: FetchOptions) {
   const { pathname, method, body, query, headers } = options;
