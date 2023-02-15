@@ -14,6 +14,7 @@ import {
   EuiLink,
   EuiText,
   EuiIcon,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import { euiStyled } from '@kbn/kibana-react-plugin/common';
@@ -21,6 +22,8 @@ import { WaterfallTooltipContent } from './waterfall_tooltip_content';
 import { WaterfallChartTooltip } from './styles';
 import { FIXED_AXIS_HEIGHT, RESOURCE_TITLE_FONT_SIZE } from './constants';
 import { formatTooltipHeading } from '../../common/network_data/data_formatting';
+import { useWaterfallContext } from './context/waterfall_context';
+import { useStepMetrics } from '../../hooks/use_step_metrics';
 
 interface Props {
   index: number;
@@ -108,6 +111,12 @@ export const MiddleTruncatedText = ({
   url,
   highestIndex,
 }: Props) => {
+  // const { activeStep } = useWaterfallContext();
+  // const { totalDuration } = useStepMetrics(activeStep);
+  // const duration = totalDuration?.value;
+  // const start = new Date(activeStep?.['@timestamp']!).valueOf();
+  // const end = start + duration!;
+
   const secureHttps = fullText.startsWith('https://');
   const text = fullText.replace(/https:\/\/www.|http:\/\/www.|http:\/\/|https:\/\//, '');
 
@@ -120,6 +129,7 @@ export const MiddleTruncatedText = ({
       <EuiScreenReaderOnly>
         <span data-test-subj="middleTruncatedTextSROnly">{fullText}</span>
       </EuiScreenReaderOnly>
+
       <WaterfallChartTooltip
         as={EuiToolTip}
         content={
@@ -183,6 +193,15 @@ export const MiddleTruncatedText = ({
             </span>
           </EuiScreenReaderOnly>
         </EuiLink>
+      </span>
+      <span>
+        {url.indexOf('/js/') !== -1 && (
+          <EuiButtonIcon
+            href="/app/apm/services/heartbeat/overview?comparisonEnabled=true&environment=ENVIRONMENT_ALL&kuery=&latencyAggregationType=avg&offset=1d&rangeFrom=2023-02-15T18:57:00.000Z&rangeTo=2023-02-15T19:00:00.000Z&serviceGroup=&transactionType=output"
+            iconType="iInCircle"
+            target="_blank"
+          />
+        )}
       </span>
     </OuterContainer>
   );

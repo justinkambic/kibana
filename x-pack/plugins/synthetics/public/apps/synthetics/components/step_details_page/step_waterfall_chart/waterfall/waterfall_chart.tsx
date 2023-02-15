@@ -40,13 +40,8 @@ export interface WaterfallChartProps {
   renderFlyout?: RenderElement;
 }
 
-export const WaterfallChart = ({
-  tickFormat,
-  domain,
-  barStyleAccessor,
-  renderSidebarItem,
-  renderFlyout,
-}: WaterfallChartProps) => {
+export const WaterfallChart = (props: WaterfallChartProps) => {
+  const { tickFormat, domain, barStyleAccessor, renderSidebarItem, renderFlyout } = props;
   const { euiTheme } = useEuiTheme();
   const {
     data,
@@ -60,6 +55,7 @@ export const WaterfallChart = ({
     totalNetworkRequests,
     highlightedNetworkRequests,
     fetchedNetworkRequests,
+    activeStep,
   } = useWaterfallContext();
 
   const shouldRenderSidebar = !!(sidebarItems && renderSidebarItem);
