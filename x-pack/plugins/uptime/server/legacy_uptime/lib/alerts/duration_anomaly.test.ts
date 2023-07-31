@@ -118,10 +118,11 @@ describe('duration anomaly alert', () => {
   const mockDate = 'date';
   beforeAll(() => {
     Date.now = jest.fn().mockReturnValue(new Date('2021-05-13T12:33:37.000Z'));
-    // @ts-expect-error ts upgrade v4.7.4
     jest.spyOn(Intl, 'DateTimeFormat').mockImplementation(() => ({
       format: jest.fn(),
       formatToParts: jest.fn(),
+      formatRange: jest.fn(),
+      formatRangeToParts: jest.fn(),
       resolvedOptions: () => ({
         locale: '',
         calendar: '',
