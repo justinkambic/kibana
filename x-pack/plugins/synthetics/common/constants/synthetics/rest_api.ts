@@ -44,6 +44,7 @@ export enum SYNTHETICS_API_URLS {
   FILTERS = '/internal/synthetics/monitor/filters',
 
   CERTS = '/internal/synthetics/certs',
+  CERT_THRESHOLDS = '/internal/synthetics/certs/thresholds',
 
   // Project monitor public endpoint
   SYNTHETICS_MONITORS_PROJECT = '/api/synthetics/project/{projectName}/monitors',

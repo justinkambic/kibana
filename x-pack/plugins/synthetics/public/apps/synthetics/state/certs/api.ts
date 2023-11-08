@@ -22,3 +22,12 @@ export const getCertsList = async (queryParams: GetCertsParams): Promise<CertRes
   };
   return result.data;
 };
+
+interface CertThresholds {
+  certAgeThreshold: number;
+  certExpirationThreshold: number;
+}
+
+export const getCertsSettings = async (): Promise<CertThresholds> => {
+  return (await apiService.get<{ data: CertThresholds }>(SYNTHETICS_API_URLS.CERT_THRESHOLDS)).data;
+};

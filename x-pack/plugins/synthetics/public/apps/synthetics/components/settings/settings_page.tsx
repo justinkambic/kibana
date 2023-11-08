@@ -15,6 +15,7 @@ import { ParamsList } from './global_params/params_list';
 import { DataRetentionTab } from './data_retention';
 import { useSettingsBreadcrumbs } from './use_settings_breadcrumbs';
 import { ManagePrivateLocations } from './private_locations/manage_private_locations';
+import { TLSSettings } from './tls_settings';
 
 export const SettingsPage = () => {
   useSettingsBreadcrumbs();
@@ -37,6 +38,8 @@ export const SettingsPage = () => {
             <AlertDefaultsForm />
           </EuiPanel>
         );
+      case 'tls':
+        return <TLSSettings />;
       default:
         return <Redirect to="/settings/alerting" />;
     }

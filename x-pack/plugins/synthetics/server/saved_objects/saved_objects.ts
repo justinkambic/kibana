@@ -27,6 +27,7 @@ import {
   SYNTHETICS_MONITOR_ENCRYPTED_TYPE,
 } from './synthetics_monitor';
 import { syntheticsServiceApiKey } from './service_api_key';
+import { syntheticsCertThresholdSavedObjectsType } from './certificates_param';
 
 export type UMSavedObjectsQueryFn<T = any, P = undefined> = (
   client: SavedObjectsClientContract,
@@ -42,6 +43,7 @@ export const registerUptimeSavedObjects = (
   savedObjectsService.registerType(getSyntheticsMonitorSavedObjectType(encryptedSavedObjects));
   savedObjectsService.registerType(syntheticsServiceApiKey);
   savedObjectsService.registerType(syntheticsParamSavedObjectType);
+  savedObjectsService.registerType(syntheticsCertThresholdSavedObjectsType);
 
   encryptedSavedObjects.registerType({
     type: syntheticsServiceApiKey.name,

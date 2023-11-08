@@ -6,10 +6,11 @@
  */
 
 import React, { ChangeEvent, useState } from 'react';
-import { EuiFieldSearch } from '@elastic/eui';
+import { EuiButton, EuiFieldSearch, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import styled from 'styled-components';
 import useDebounce from 'react-use/lib/useDebounce';
-import * as labels from './translations';
+import { TLS_SETTINGS_ROUTE } from '../../../../../common/constants';
+import { SEARCH_CERTS } from './translations';
 
 const WrapFieldSearch = styled('div')`
   max-width: 700px;
@@ -35,15 +36,24 @@ export const CertificateSearch: React.FC<Props> = ({ setSearch }) => {
   );
 
   return (
-    <WrapFieldSearch>
-      <EuiFieldSearch
-        data-test-subj="uptimeCertSearch"
-        placeholder={labels.SEARCH_CERTS}
-        onChange={onChange}
-        isClearable={true}
-        aria-label={labels.SEARCH_CERTS}
-        fullWidth={true}
-      />
-    </WrapFieldSearch>
+    <EuiFlexGroup justifyContent="spaceBetween">
+      <EuiFlexItem>
+        <WrapFieldSearch>
+          <EuiFieldSearch
+            data-test-subj="uptimeCertSearch"
+            placeholder={SEARCH_CERTS}
+            onChange={onChange}
+            isClearable={true}
+            aria-label={SEARCH_CERTS}
+            fullWidth={true}
+          />
+        </WrapFieldSearch>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiButton href={TLS_SETTINGS_ROUTE} data-test-subj="xpack.synthetics.tls.settingsButton">
+          Settings
+        </EuiButton>
+      </EuiFlexItem>
+    </EuiFlexGroup>
   );
 };
