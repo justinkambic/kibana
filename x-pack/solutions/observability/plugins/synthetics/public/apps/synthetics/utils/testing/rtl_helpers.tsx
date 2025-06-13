@@ -37,6 +37,7 @@ import { stringifyUrlParams } from '../url_params';
 import { ClientPluginsStart } from '../../../../plugin';
 import { SyntheticsRefreshContextProvider } from '../../contexts';
 import { kibanaService } from '../../../../utils/kibana_service';
+import { LIGHT_THEME } from '@elastic/charts';
 
 type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
@@ -170,6 +171,19 @@ export const mockCore: () => Partial<CoreStart> = () => {
     chrome: {
       ...defaultCore.chrome,
       getChromeStyle$: () => new BehaviorSubject<ChromeStyle>('classic').asObservable(),
+    },
+    charts: {
+      theme: {
+        useChartsBaseTheme: jest.fn(),
+        chartsDefaultBaseTheme: LIGHT_THEME,
+        // @ts-expect-error mock
+        chartsBaseTheme$: { subscribe: jest.fn() },
+        // @ts-expect-error mock
+        darkModeEnabled$: { subscribe: jest.fn() },
+        useDarkMode: jest.fn(),
+        useChartsTheme: jest.fn(),
+        useSparklineOverrides: jest.fn(),
+      },
     },
   };
 

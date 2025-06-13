@@ -72,6 +72,7 @@ export const MetricItem = ({
 }) => {
   const { euiTheme } = useEuiTheme();
   const trendData = useSelector(selectOverviewTrends)[monitor.configId + monitor.locationId];
+  console.log(trendData);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const isErrorPopoverOpen = useSelector(selectErrorPopoverState);
   const locationName = useLocationName(monitor);
