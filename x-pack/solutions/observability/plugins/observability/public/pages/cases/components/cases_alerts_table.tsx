@@ -8,7 +8,8 @@
 import React from 'react';
 import { CaseViewAlertsTableProps } from '@kbn/cases-plugin/common';
 import { useKibana } from '../../../utils/kibana_react';
-import { AlertActions, GetObservabilityAlertsTableProp, ObservabilityAlertsTable } from '../../..';
+import { AlertActions } from './alert_actions';
+import { GetObservabilityAlertsTableProp, ObservabilityAlertsTable } from '../../..';
 
 export function CasesAlertsTable(props: CaseViewAlertsTableProps) {
   const { cases, data, http, notifications, fieldFormats, application, licensing, settings } =

@@ -13,6 +13,7 @@ import { patchAlertComment } from './api';
 import { casesMutationsKeys } from './constants';
 import * as i18n from './translations';
 import type { AlertAttachmentPayload } from '../../common/types/domain';
+import { useCasesContext } from '../components/cases_context/use_cases_context';
 
 interface MutationArgs {
   caseId: string;
@@ -26,6 +27,7 @@ interface MutationArgs {
 export const useUpdateAlertComment = () => {
   const { showErrorToast, showSuccessToast } = useCasesToast();
   const refreshCaseViewPage = useRefreshCaseViewPage();
+  const owner = useCasesContext().owner[0];
   // this hook guarantees that there will be at least one value in the owner array, we'll
   // just use the first entry just in case there are more than one entry
 
@@ -39,7 +41,7 @@ export const useUpdateAlertComment = () => {
           index: commentUpdate.index,
           rule: commentUpdate.rule,
           version: commentUpdate.version,
-          owner: commentUpdate.owner,
+          owner,
           type: commentUpdate.type,
         },
       }),

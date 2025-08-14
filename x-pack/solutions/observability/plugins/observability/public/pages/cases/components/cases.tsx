@@ -76,9 +76,7 @@ export function Cases({ permissions }: CasesProps) {
         }}
         showAlertDetails={handleShowAlertDetails}
         useFetchAlertData={useFetchAlertData}
-        renderAlertsTable={(props) => {
-          return <CasesAlertsTable {...props} />;
-        }}
+        renderAlertsTable={CasesAlertsTable}
       />
 
       {alertDetail && selectedAlertId !== '' && !alertLoading ? (

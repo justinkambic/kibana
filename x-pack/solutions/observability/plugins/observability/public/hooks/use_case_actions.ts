@@ -16,7 +16,7 @@ import { i18n } from '@kbn/i18n';
 import type { Alert } from '@kbn/alerting-types';
 import { CasesService } from '@kbn/response-ops-alerts-table/types';
 import { AttachmentUI } from '@kbn/cases-plugin/common/ui';
-import type { EventNonEcsData } from '../../../common/typings';
+import { EventNonEcsData } from '../../common/typings';
 
 export const useCaseActions = ({
   alerts,

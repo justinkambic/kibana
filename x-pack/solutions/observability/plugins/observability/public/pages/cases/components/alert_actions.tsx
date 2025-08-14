@@ -27,17 +27,17 @@ import {
   useDeletePropertyAction,
   DeleteAttachmentConfirmationModal,
 } from '@kbn/cases-plugin/public';
-import { useCaseActions } from '../../hooks/use_case_actions';
-import { RULE_DETAILS_PAGE_ID } from '../../pages/rule_details/constants';
-import { paths, SLO_DETAIL_PATH } from '../../../common/locators/paths';
-import { parseAlert } from '../../pages/alerts/helpers/parse_alert';
+import { useCaseActions } from '../../../hooks/use_case_actions';
+import { RULE_DETAILS_PAGE_ID } from '../../rule_details/constants';
+import { paths, SLO_DETAIL_PATH } from '../../../../common/locators/paths';
+import { parseAlert } from '../../alerts/helpers/parse_alert';
 import {
   GetObservabilityAlertsTableProp,
   ObservabilityAlertsTableContext,
   observabilityFeatureId,
-} from '../..';
-import { ALERT_DETAILS_PAGE_ID } from '../../pages/alert_details/alert_details';
-import { useKibana } from '../../utils/kibana_react';
+} from '../../..';
+import { ALERT_DETAILS_PAGE_ID } from '../../alert_details/alert_details';
+import { useKibana } from '../../../utils/kibana_react';
 
 export function AlertActions({
   observabilityRuleTypeRegistry,
