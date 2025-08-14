@@ -196,6 +196,7 @@ export class CasesUiPlugin
       hooks: {
         useCasesAddToNewCaseFlyout,
         useCasesAddToExistingCaseModal,
+        useCasesRemoveAlertFromCase,
         useIsAddToCaseOpen,
       },
       helpers: {
