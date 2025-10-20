@@ -70,13 +70,11 @@ export class GetSLOStatsOverview {
     const querySLOsForIds = filtersProvided || kqlQueriesProvided;
 
     const sloRuleQueryKeys: string[] = [];
-    const instanceIdIncluded = Object.values(params).find(
+    const instanceId = Object.values(params).find(
       (value) => typeof value === 'string' && value.includes('slo.instanceId')
     );
-    let alertFilters: QueryDslQueryContainer[] = [];
-    let alertFilterTerms: QueryDslQueryContainer[] = [];
+    const alertFilterTerms: QueryDslQueryContainer[] = [];
     let afterKey: AggregationsAggregate | undefined;
-    let ruleFilters: KueryNode | undefined;
 
     try {
       if (querySLOsForIds) {
@@ -93,7 +91,7 @@ export class GetSLOStatsOverview {
                     {
                       sloId: { terms: { field: 'slo.id' } },
                     },
-                    ...(instanceIdIncluded
+                    ...(instanceId
                       ? [
                           {
                             sloInstanceId: { terms: { field: 'slo.instanceId' } },
@@ -123,48 +121,34 @@ export class GetSLOStatsOverview {
               buckets?: Array<{ key: { sloId: string; sloInstanceId: string } }>;
             }
           )?.buckets;
-          if (buckets && buckets.length > 0) {
-            alertFilterTerms = alertFilterTerms.concat(
-              ...buckets.map((bucket) => {
-                sloRuleQueryKeys.push(bucket.key.sloId);
-                return {
-                  bool: {
-                    must: [
-                      { term: { 'kibana.alert.rule.parameters.sloId': bucket.key.sloId } },
-                      ...(instanceIdIncluded
-                        ? [
-                            {
-                              term: {
-                                'kibana.alert.instance.id': bucket.key.sloInstanceId,
-                              },
-                            },
-                          ]
-                        : []),
-                    ],
-                  },
-                };
-              })
+          if (buckets) {
+            alertFilterTerms.push(
+              ...this.processSloQueryBuckets(buckets, sloRuleQueryKeys, instanceId)
             );
           }
         } while (afterKey);
-
-        const resultNodes = nodeBuilder.or(
-          sloRuleQueryKeys.map((sloId) => nodeBuilder.is(`alert.attributes.params.sloId`, sloId))
-        );
-
-        ruleFilters = resultNodes;
-        alertFilters = [
-          {
-            bool: {
-              should: [...alertFilterTerms],
-            },
-          },
-        ];
       }
     } catch (error) {
       this.logger.error(`Error querying SLOs for IDs: ${error}`);
       throw error;
     }
+
+    const ruleFilters: KueryNode | undefined =
+      sloRuleQueryKeys.length > 0
+        ? nodeBuilder.or(
+            sloRuleQueryKeys.map((sloId) => nodeBuilder.is(`alert.attributes.params.sloId`, sloId))
+          )
+        : undefined;
+    const alertFilters =
+      alertFilterTerms.length > 0
+        ? [
+            {
+              bool: {
+                should: [...alertFilterTerms],
+              },
+            },
+          ]
+        : [];
 
     const response = await typedSearch(this.scopedClusterClient.asCurrentUser, {
       index: indices,
@@ -234,7 +218,65 @@ export class GetSLOStatsOverview {
     /*
      If we know there are no SLOs that match the provided filters, we can skip querying for rules and alerts
     */
-    const [rules, alerts] = await Promise.all(
+    const [rules, alerts] = await this.fetchRulesAndAlerts({
+      querySLOsForIds,
+      sloRuleQueryKeys,
+      ruleFilters,
+      alertFilters,
+    });
+
+    const aggs = response.aggregations;
+
+    return {
+      violated: aggs?.not_stale?.violated.doc_count ?? 0,
+      degrading: aggs?.not_stale?.degrading.doc_count ?? 0,
+      healthy: aggs?.not_stale?.healthy?.doc_count ?? 0,
+      noData: aggs?.not_stale?.noData.doc_count ?? 0,
+      stale: aggs?.stale.doc_count ?? 0,
+      burnRateRules: rules.total,
+      burnRateActiveAlerts: alerts.activeAlertCount,
+      burnRateRecoveredAlerts: alerts.recoveredAlertCount,
+    };
+  }
+
+  private processSloQueryBuckets(
+    buckets: Array<{ key: { sloId: string; sloInstanceId: string } }>,
+    sloRuleQueryKeys: string[],
+    instanceId?: string
+  ): QueryDslQueryContainer[] {
+    return buckets.map((bucket) => {
+      sloRuleQueryKeys.push(bucket.key.sloId);
+      return {
+        bool: {
+          must: [
+            { term: { 'kibana.alert.rule.parameters.sloId': bucket.key.sloId } },
+            ...(instanceId
+              ? [
+                  {
+                    term: {
+                      'kibana.alert.instance.id': bucket.key.sloInstanceId,
+                    },
+                  },
+                ]
+              : []),
+          ],
+        },
+      };
+    });
+  }
+
+  private async fetchRulesAndAlerts({
+    querySLOsForIds,
+    sloRuleQueryKeys,
+    ruleFilters,
+    alertFilters,
+  }: {
+    querySLOsForIds: boolean;
+    sloRuleQueryKeys: string[];
+    ruleFilters?: KueryNode;
+    alertFilters?: QueryDslQueryContainer[];
+  }) {
+    return await Promise.all(
       querySLOsForIds && sloRuleQueryKeys.length === 0
         ? [
             {
@@ -271,18 +313,5 @@ export class GetSLOStatsOverview {
             }),
           ]
     );
-
-    const aggs = response.aggregations;
-
-    return {
-      violated: aggs?.not_stale?.violated.doc_count ?? 0,
-      degrading: aggs?.not_stale?.degrading.doc_count ?? 0,
-      healthy: aggs?.not_stale?.healthy?.doc_count ?? 0,
-      noData: aggs?.not_stale?.noData.doc_count ?? 0,
-      stale: aggs?.stale.doc_count ?? 0,
-      burnRateRules: rules.total,
-      burnRateActiveAlerts: alerts.activeAlertCount,
-      burnRateRecoveredAlerts: alerts.recoveredAlertCount,
-    };
   }
 }
