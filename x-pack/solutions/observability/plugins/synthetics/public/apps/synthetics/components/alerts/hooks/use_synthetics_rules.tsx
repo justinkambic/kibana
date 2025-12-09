@@ -16,6 +16,7 @@ import { useSyntheticsSettingsContext } from '../../../contexts';
 import {
   selectSyntheticsAlerts,
   selectSyntheticsAlertsLoading,
+  selectSyntheticsAlertsLoaded,
 } from '../../../state/alert_rules/selectors';
 import {
   enableDefaultAlertingSilentlyAction,
@@ -35,6 +36,7 @@ export const useSyntheticsRules = (isOpen: boolean) => {
 
   const defaultRules = useSelector(selectSyntheticsAlerts);
   const loading = useSelector(selectSyntheticsAlertsLoading);
+  const rulesLoaded = useSelector(selectSyntheticsAlertsLoaded);
   const alertFlyoutVisible = useSelector(selectAlertFlyoutVisibility);
   const isNewRule = useSelector(selectIsNewRule);
   const { settings } = useSelector(selectDynamicSettings);
@@ -69,6 +71,13 @@ export const useSyntheticsRules = (isOpen: boolean) => {
     // we don't want to run this on defaultRules change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isOpen, hasMonitors, defaultRulesEnabled]);
+
+  // Fetch default rules when popover opens if they haven't been loaded yet
+  useEffect(() => {
+    if (isOpen && !loading && rulesLoaded === null) {
+      dispatch(getDefaultAlertingAction.get());
+    }
+  }, [isOpen, loading, rulesLoaded, dispatch]);
 
   const {
     triggersActionsUi: { ruleTypeRegistry, actionTypeRegistry },
