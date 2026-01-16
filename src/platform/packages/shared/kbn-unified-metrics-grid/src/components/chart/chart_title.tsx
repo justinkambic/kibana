@@ -33,11 +33,12 @@ export const ChartTitle = ({
         transition-delay: ${euiTheme.animation.fast};
 
         overflow: hidden;
-        height: 100%;
+        height: ${euiTheme.size.l};
         line-height: ${euiTheme.size.l};
         padding: 0px ${euiTheme.size.s};
 
-        pointer-events: none;
+        user-select: text;
+        pointer-events: auto;
       `,
       chartTitleCss: css`
         font-weight: ${euiTheme.font.weight.bold};
