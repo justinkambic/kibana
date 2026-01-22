@@ -178,6 +178,89 @@ function handleExistingFilterForMultiValues(
 }
 
 /**
+ * Represents a single dimension filter for multi-dimension filtering
+ */
+export interface DimensionFilter {
+  field: string;
+  value: unknown;
+  fieldType?: string;
+}
+
+/**
+ * Creates a filter expression for multiple dimensions.
+ * For single dimension, returns `field = value` (no parentheses).
+ * For multiple dimensions, returns `(field1 = value1 AND field2 = value2 ...)` (with parentheses).
+ */
+function createMultiDimensionFilterExpression(
+  dimensionFilters: DimensionFilter[],
+  operation: SupportedOperation
+): string {
+  if (dimensionFilters.length === 0) {
+    return '';
+  }
+
+  // Handle single dimension case (no parentheses)
+  if (dimensionFilters.length === 1) {
+    const { field, value, fieldType } = dimensionFilters[0];
+    const { expression } = createFilterExpression(field, value, operation, fieldType);
+    return expression;
+  }
+
+  // Handle multiple dimensions (with parentheses)
+  const filterExpressions = dimensionFilters
+    .map(({ field, value, fieldType }) => {
+      const { expression } = createFilterExpression(field, value, operation, fieldType);
+      return expression;
+    })
+    .filter((expr) => expr.length > 0);
+
+  if (filterExpressions.length === 0) {
+    return '';
+  }
+
+  // Wrap multiple dimension filters in parentheses
+  return `(${filterExpressions.join(' AND ')})`;
+}
+
+/**
+ * Appends a multi-dimension filter to an existing ES|QL query string.
+ * This function handles filtering by multiple dimensions simultaneously, wrapping
+ * multi-dimension filters in parentheses for proper query structure.
+ *
+ * @param baseESQLQuery the base ES|QL query to append the WHERE clause to.
+ * @param dimensionFilters an array of dimension filters, each containing field, value, and optional fieldType.
+ * @param operation the operation to perform ('+', '-', 'is_not_null', 'is_null').
+ * @returns the modified ES|QL query string with the appended WHERE clause, or undefined if no changes were made.
+ */
+export function appendMultiDimensionFilterToESQLQuery(
+  baseESQLQuery: string,
+  dimensionFilters: DimensionFilter[],
+  operation: SupportedOperation = '+'
+): string | undefined {
+  if (!dimensionFilters || dimensionFilters.length === 0) {
+    return baseESQLQuery;
+  }
+
+  const filterExpression = createMultiDimensionFilterExpression(dimensionFilters, operation);
+
+  if (!filterExpression) {
+    return baseESQLQuery;
+  }
+
+  const { root } = Parser.parse(baseESQLQuery);
+  const lastCommand = root.commands[root.commands.length - 1];
+  const isLastCommandWhere = lastCommand.name === 'where';
+
+  // If query doesn't end with WHERE clause, add new WHERE clause
+  if (!isLastCommandWhere) {
+    return appendToESQLQuery(baseESQLQuery, `| WHERE ${filterExpression}`);
+  }
+
+  // If query ends with WHERE clause, append with AND
+  return appendToESQLQuery(baseESQLQuery, `AND ${filterExpression}`);
+}
+
+/**
  * Appends a WHERE clause to an existing ES|QL query string.
  * @param baseESQLQuery the base ES|QL query to append the WHERE clause to.
  * @param field the field to filter on.

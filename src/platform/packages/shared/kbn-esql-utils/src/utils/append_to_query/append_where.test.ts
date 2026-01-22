@@ -7,7 +7,11 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import { appendWhereClauseToESQLQuery } from './append_where';
+import {
+  appendWhereClauseToESQLQuery,
+  appendMultiDimensionFilterToESQLQuery,
+  type DimensionFilter,
+} from './append_where';
 
 describe('appendWhereClauseToESQLQuery', () => {
   it('appends a filter in where clause in an existing query', () => {
@@ -252,5 +256,179 @@ AND MATCH(\`tags.keyword\`, "info") AND MATCH(\`tags.keyword\`, "success")`
       `from logstash-*
 | WHERE \`tags.keyword\` is null`
     );
+  });
+});
+
+describe('appendMultiDimensionFilterToESQLQuery', () => {
+  describe('single dimension (no parentheses)', () => {
+    it('appends a single dimension filter without WHERE clause', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE \`host.name\` == "server-1"`
+      );
+    });
+
+    it('appends a single dimension filter with WHERE clause (appends AND)', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(
+        appendMultiDimensionFilterToESQLQuery(
+          'FROM metrics-* | WHERE env == "prod"',
+          dimensionFilters,
+          '+'
+        )
+      ).toBe(
+        `FROM metrics-* | WHERE env == "prod"
+AND \`host.name\` == "server-1"`
+      );
+    });
+
+    it('handles single dimension with != operation', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '-')).toBe(
+        `FROM metrics-*
+| WHERE \`host.name\` != "server-1"`
+      );
+    });
+  });
+
+  describe('multiple dimensions (with parentheses)', () => {
+    it('appends multiple dimension filters without WHERE clause', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+        { field: 'region', value: 'us-east', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE (\`host.name\` == "server-1" AND \`region\` == "us-east")`
+      );
+    });
+
+    it('appends multiple dimension filters with WHERE clause (appends AND)', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+        { field: 'region', value: 'us-east', fieldType: 'string' },
+      ];
+      expect(
+        appendMultiDimensionFilterToESQLQuery(
+          'FROM metrics-* | WHERE env == "prod"',
+          dimensionFilters,
+          '+'
+        )
+      ).toBe(
+        `FROM metrics-* | WHERE env == "prod"
+AND (\`host.name\` == "server-1" AND \`region\` == "us-east")`
+      );
+    });
+
+    it('handles three dimensions', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+        { field: 'region', value: 'us-east', fieldType: 'string' },
+        { field: 'zone', value: 'zone-a', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE (\`host.name\` == "server-1" AND \`region\` == "us-east" AND \`zone\` == "zone-a")`
+      );
+    });
+
+    it('handles multiple dimensions with != operation', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+        { field: 'region', value: 'us-east', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '-')).toBe(
+        `FROM metrics-*
+| WHERE (\`host.name\` != "server-1" AND \`region\` != "us-east")`
+      );
+    });
+  });
+
+  describe('field type handling', () => {
+    it('handles different field types correctly', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+        { field: 'host.ip', value: '192.168.1.1', fieldType: 'ip' },
+        { field: 'cpu.cores', value: 8, fieldType: 'number' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE (\`host.name\` == "server-1" AND \`host.ip\` == "192.168.1.1" AND \`cpu.cores\` == 8)`
+      );
+    });
+
+    it('applies string casting when fieldType is not provided', () => {
+      const dimensionFilters: DimensionFilter[] = [{ field: 'host.name', value: 'server-1' }];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE \`host.name\`::string == "server-1"`
+      );
+    });
+  });
+
+  describe('edge cases', () => {
+    it('returns original query when dimensionFilters is empty', () => {
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', [], '+')).toBe(
+        'FROM metrics-*'
+      );
+    });
+
+    it('handles query with comments', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(
+        appendMultiDimensionFilterToESQLQuery('FROM metrics-* // comment', dimensionFilters, '+')
+      ).toBe(
+        `FROM metrics-* // comment
+| WHERE \`host.name\` == "server-1"`
+      );
+    });
+
+    it('handles query ending with different command (not WHERE)', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(
+        appendMultiDimensionFilterToESQLQuery(
+          'FROM metrics-* | STATS count() BY host.name',
+          dimensionFilters,
+          '+'
+        )
+      ).toBe(
+        `FROM metrics-* | STATS count() BY host.name
+| WHERE \`host.name\` == "server-1"`
+      );
+    });
+
+    it('handles special characters in values', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1 (production)', fieldType: 'string' },
+        { field: 'region', value: 'us-east-1', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters, '+')).toBe(
+        `FROM metrics-*
+| WHERE (\`host.name\` == "server-1 (production)" AND \`region\` == "us-east-1")`
+      );
+    });
+  });
+
+  describe('default operation', () => {
+    it('defaults to + operation when not specified', () => {
+      const dimensionFilters: DimensionFilter[] = [
+        { field: 'host.name', value: 'server-1', fieldType: 'string' },
+      ];
+      expect(appendMultiDimensionFilterToESQLQuery('FROM metrics-*', dimensionFilters)).toBe(
+        `FROM metrics-*
+| WHERE \`host.name\` == "server-1"`
+      );
+    });
   });
 });
