@@ -27,6 +27,8 @@ import useLatest from 'react-use/lib/useLatest';
 import type { RequestAdapter } from '@kbn/inspector-plugin/common';
 import type { DatatableColumn } from '@kbn/expressions-plugin/common';
 import { ESQL_TABLE_TYPE } from '@kbn/data-plugin/common';
+import { isOfAggregateQueryType } from '@kbn/es-query';
+import { appendWhereClauseToESQLQuery } from '@kbn/esql-utils';
 import { useProfileAccessor } from '../../../../context_awareness';
 import { useDiscoverCustomization } from '../../../../customizations';
 import { useDiscoverServices } from '../../../../hooks/use_discover_services';
@@ -391,6 +393,43 @@ export const useDiscoverHistogram = (
     [timeInterval, dispatch, updateAppState]
   );
 
+  const defaultEsqlOnFilter = useCallback<NonNullable<UseUnifiedHistogramProps['onFilter']>>(
+    (eventData) => {
+      if (!isOfAggregateQueryType(query)) {
+        return;
+      }
+      for (const datum of eventData.data) {
+        if (!('column' in datum)) {
+          continue;
+        }
+        const col = datum.table.columns[datum.column];
+        if (!col || col.id === eventData.timeFieldName || col.meta?.type === 'date') {
+          continue;
+        }
+        const fieldName = String(col.meta?.sourceParams?.sourceField ?? col.id);
+        const value = datum.table.rows[datum.row]?.[col.id];
+        const updatedQuery = appendWhereClauseToESQLQuery(
+          query.esql,
+          fieldName,
+          value != null ? String(value) : undefined,
+          '+',
+          col.meta?.type
+        );
+        if (updatedQuery) {
+          services.data.query.queryString.setQuery({ esql: updatedQuery });
+          if ('preventDefault' in eventData && typeof eventData.preventDefault === 'function') {
+            eventData.preventDefault();
+          }
+          break;
+        }
+      }
+    },
+    [query, services.data.query.queryString]
+  );
+
+  const onFilter =
+    histogramCustomization?.onFilter ?? (isEsqlMode ? defaultEsqlOnFilter : undefined);
+
   return useMemo(
     () => ({
       setUnifiedHistogramApi,
@@ -403,7 +442,7 @@ export const useDiscoverHistogram = (
         totalHitsStatus: UnifiedHistogramFetchStatus.loading,
         totalHitsResult: undefined,
       },
-      onFilter: histogramCustomization?.onFilter,
+      onFilter,
       onBrushEnd: histogramCustomization?.onBrushEnd,
       withDefaultActions: histogramCustomization?.withDefaultActions,
       disabledActions: histogramCustomization?.disabledActions,
@@ -416,11 +455,11 @@ export const useDiscoverHistogram = (
       chartHidden,
       histogramCustomization?.disabledActions,
       histogramCustomization?.onBrushEnd,
-      histogramCustomization?.onFilter,
       histogramCustomization?.withDefaultActions,
       isEsqlMode,
       isChartLoading,
       onBreakdownFieldChange,
+      onFilter,
       onTimeIntervalChange,
       onVisContextChanged,
       options?.initialLayoutProps?.topPanelHeight,

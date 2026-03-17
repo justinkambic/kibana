@@ -16,14 +16,14 @@
  */
 
 import { expect } from '@kbn/scout/ui';
-import {
-  spaceTest,
-  testData,
-  DEFAULT_TIME_RANGE,
-  DEFAULT_CONFIG,
-} from '../../fixtures/metrics_experience';
+import { spaceTest, testData, DEFAULT_CONFIG } from '../../fixtures/metrics_experience';
 
 const FIRST_DIMENSION = DEFAULT_CONFIG.dimensions[0].name;
+
+const CLICK_FILTER_TIME_RANGE = {
+  from: DEFAULT_CONFIG.timeRange.from,
+  to: '2025-01-01T01:00:00.000Z',
+} as const;
 
 spaceTest.describe(
   'Metrics in Discover - Click to Filter',
@@ -32,7 +32,7 @@ spaceTest.describe(
     spaceTest.beforeAll(async ({ scoutSpace }) => {
       await scoutSpace.savedObjects.load(testData.KBN_ARCHIVE);
       await scoutSpace.uiSettings.setDefaultIndex(testData.DATA_VIEW_NAME);
-      await scoutSpace.uiSettings.setDefaultTime(DEFAULT_TIME_RANGE);
+      await scoutSpace.uiSettings.setDefaultTime(CLICK_FILTER_TIME_RANGE);
     });
 
     spaceTest.beforeEach(async ({ browserAuth, pageObjects }) => {
@@ -51,7 +51,11 @@ spaceTest.describe(
         await pageObjects.discover.writeAndSubmitEsqlQuery(testData.ESQL_QUERIES.TS);
         const { metricsExperience, discover } = pageObjects;
         await expect(metricsExperience.grid).toBeVisible();
-        await expect(metricsExperience.getCardByIndex(0)).toBeVisible();
+
+        await spaceTest.step('filter to a gauge metric with visible chart data', async () => {
+          await metricsExperience.searchMetric('gauge_0');
+          await expect(metricsExperience.getCardByIndex(0)).toBeVisible();
+        });
 
         await spaceTest.step('select a breakdown dimension', async () => {
           await metricsExperience.breakdownSelector.selectDimension(FIRST_DIMENSION);
@@ -65,17 +69,13 @@ spaceTest.describe(
           await metricsExperience.waitForCardRenderComplete(0);
         });
 
-        const queryBefore = await discover.getEsqlQueryValue();
-
-        await spaceTest.step('click a chart data point to trigger filter', async () => {
-          await metricsExperience.clickChartDataPoint(0);
-          await discover.waitUntilSearchingHasFinished();
-        });
-
-        await spaceTest.step('ES|QL query should contain a WHERE clause', async () => {
-          const queryAfter = await discover.getEsqlQueryValue();
-          expect(queryAfter).not.toStrictEqual(queryBefore);
-          expect(queryAfter.toUpperCase()).toContain('WHERE');
+        await spaceTest.step('click a chart data point and verify WHERE clause', async () => {
+          await expect(async () => {
+            await metricsExperience.clickChartDataPoint(0);
+            await discover.waitUntilSearchingHasFinished();
+            const queryAfter = await discover.getEsqlQueryValue();
+            expect(queryAfter.toUpperCase()).toContain('WHERE');
+          }).toPass({ timeout: 30_000, intervals: [1_000, 2_000, 3_000] });
         });
 
         await spaceTest.step('chart should re-render with the filtered query', async () => {

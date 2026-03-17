@@ -125,16 +125,96 @@ export class MetricsExperiencePage {
     await expect(panel).toBeVisible();
   }
 
+  private clickAttempt = 0;
+
   /**
-   * Clicks at the center of the chart canvas in a metric card to trigger
-   * Lens's click-to-filter action (appends a WHERE clause to the query).
+   * Clicks on a chart data point in a metric card to trigger Lens's
+   * click-to-filter action (appends a WHERE clause to the query).
    * Requires a breakdown dimension to be active so the click targets a
    * specific series data point.
+   *
+   * Scans all three color channels across the plot area to find candidate
+   * click positions on data-line pixels, then clicks a different one on
+   * every invocation so that the `toPass` retry loop sweeps across
+   * positions until one lands within elastic-charts' ~10 px hit radius.
+   * Uses `page.mouse` directly (same mechanism as the brush helper)
+   * rather than `locator.click()` to avoid actionability overhead.
    */
   public async clickChartDataPoint(index: number): Promise<void> {
+    const card = this.getCardByIndex(index);
     const canvas = this.getChartCanvasForCard(index);
     await canvas.waitFor({ state: 'visible' });
-    await canvas.click();
+
+    const overlaySelector = '.embPanel__hoverActions, .embPanel__header';
+    await card.evaluate((el, sel) => {
+      el.querySelectorAll<HTMLElement>(sel).forEach((overlay) => {
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+      });
+    }, overlaySelector);
+
+    try {
+      const box = await canvas.boundingBox();
+      if (!box) {
+        await canvas.click();
+        return;
+      }
+
+      const positions = await canvas.evaluate((cvs: HTMLCanvasElement) => {
+        const ctx = cvs.getContext('2d');
+        if (!ctx) return [];
+
+        const w = cvs.width;
+        const h = cvs.height;
+        const dpr = w / cvs.clientWidth || 1;
+        const results: Array<{ x: number; y: number }> = [];
+        const seen = new Set<string>();
+
+        const yMin = Math.round(h * 0.02);
+        const yMax = Math.round(h * 0.82);
+
+        for (let lx = Math.round(w * 0.1); lx < Math.round(w * 0.98); lx += 2) {
+          for (let ly = yMin; ly < yMax; ly += 1) {
+            const [r, g, b, a] = ctx.getImageData(lx, ly, 1, 1).data;
+            if (a < 80) continue;
+            const mx = Math.max(r, g, b);
+            const mn = Math.min(r, g, b);
+            if (mx === 0 || (mx - mn) / mx < 0.4) continue;
+
+            const cssX = Math.round(lx / dpr);
+            const cssY = Math.round(ly / dpr);
+            const key = `${cssX},${cssY}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              results.push({ x: cssX, y: cssY });
+            }
+            break;
+          }
+        }
+        return results;
+      });
+
+      if (positions.length === 0) {
+        await canvas.click();
+        return;
+      }
+
+      const posIndex = this.clickAttempt % positions.length;
+      this.clickAttempt++;
+      const pos = positions[posIndex];
+
+      const absX = box.x + pos.x;
+      const absY = box.y + pos.y;
+
+      await this.page.mouse.move(absX, absY);
+      await this.page.mouse.down();
+      await this.page.mouse.up();
+    } finally {
+      await card.evaluate((el, sel) => {
+        el.querySelectorAll<HTMLElement>(sel).forEach((overlay) => {
+          overlay.style.removeProperty('pointer-events');
+        });
+      }, overlaySelector);
+    }
   }
 
   /**
