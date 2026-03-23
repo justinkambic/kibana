@@ -9,6 +9,10 @@
 
 /**
  * Generates a very long and complex distributed trace with many nested spans.
+ *
+ * Pass --scenarioOpts "deepChainLength=75" to instead generate a single linear
+ * chain of that depth (useful for testing scroll-to-highlighted behaviour).
+ * The deepest span ("deep-chain-leaf") has an error attached as a scroll target.
  */
 
 /* eslint-disable @typescript-eslint/no-shadow */
@@ -23,8 +27,50 @@ import { withClient } from '../lib/utils/with_client';
 const ENVIRONMENT = getSynthtraceEnvironment(__filename);
 
 const scenario: Scenario<ApmFields> = async (runOptions: RunOptions) => {
+  const deepChainLength = runOptions.scenarioOpts?.deepChainLength
+    ? Number(runOptions.scenarioOpts.deepChainLength)
+    : 0;
+
   return {
     generate: ({ range, clients: { apmEsClient } }) => {
+      if (deepChainLength > 0) {
+        const SPAN_INTERVAL_MS = 10;
+        const SPAN_DURATION_MS = 20;
+
+        const instance = apm
+          .service({ name: 'synth-node', environment: ENVIRONMENT, agentName: 'nodejs' })
+          .instance('my-instance');
+
+        const traces = range
+          .interval('1m')
+          .rate(1)
+          .generator((timestamp) => {
+            let chain = instance
+              .span({ spanName: 'deep-chain-leaf', spanType: 'app', spanSubtype: 'internal' })
+              .timestamp(timestamp + SPAN_INTERVAL_MS * deepChainLength)
+              .duration(SPAN_DURATION_MS)
+              .success();
+
+            for (let i = deepChainLength - 1; i >= 1; i--) {
+              chain = instance
+                .span({ spanName: `deep-chain-${i}`, spanType: 'app', spanSubtype: 'internal' })
+                .timestamp(timestamp + SPAN_INTERVAL_MS * i)
+                .duration(SPAN_DURATION_MS + (deepChainLength - i) * SPAN_INTERVAL_MS)
+                .success()
+                .children(chain);
+            }
+
+            return instance
+              .transaction({ transactionName: 'GET /deep-chain' })
+              .timestamp(timestamp)
+              .duration(SPAN_INTERVAL_MS * deepChainLength + SPAN_DURATION_MS + 10)
+              .success()
+              .children(chain);
+          });
+
+        return withClient(apmEsClient, traces);
+      }
+
       const ratePerMinute = 1;
       const traceDuration = 1100;
       const rootTransactionName = `${ratePerMinute}rpm / ${traceDuration}ms`;
