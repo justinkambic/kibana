@@ -304,12 +304,19 @@ export function DiscoverLayout() {
   );
 
   const fieldSupportsBreakdownOverride = useMemo(() => {
-    if (!isEsqlMode && dataView.isTSDBMode()) {
-      return (field: DataViewField) =>
-        fieldSupportsBreakdown(field) && field.timeSeriesDimension === true;
+    if (dataView.isTSDBMode()) {
+      return (field: DataViewField) => {
+        // ES|QL fields lack full metadata (aggregatable, timeSeriesDimension),
+        // so look up the field in the data view to get its mapping properties.
+        const dataViewField = dataView.getFieldByName(field.name);
+        if (dataViewField) {
+          return fieldSupportsBreakdown(dataViewField) && dataViewField.timeSeriesDimension === true;
+        }
+        return false;
+      };
     }
     return undefined;
-  }, [isEsqlMode, dataView]);
+  }, [dataView]);
 
   const updateAdHocDataViewId = useCurrentTabAction(internalStateActions.updateAdHocDataViewId);
   const onFieldEdited: (options: {

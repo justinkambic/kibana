@@ -246,9 +246,10 @@ function UnifiedFieldListItemComponent({
 }: UnifiedFieldListItemProps) {
   const [infoIsOpen, setOpen] = useState(false);
 
-  const isBreakdownSupported =
-    searchMode === 'documents'
-      ? (fieldSupportsBreakdownOverride ?? fieldSupportsBreakdown)(field)
+  const isBreakdownSupported = fieldSupportsBreakdownOverride
+    ? fieldSupportsBreakdownOverride(field)
+    : searchMode === 'documents'
+      ? fieldSupportsBreakdown(field)
       : isESQLFieldGroupable(field);
 
   const addFilterAndClosePopover: typeof onAddFilter | undefined = useMemo(
