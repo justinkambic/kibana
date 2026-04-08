@@ -29,6 +29,7 @@ import { METRIC_TYPE } from '@kbn/analytics';
 import { generateFilters } from '@kbn/data-plugin/public';
 import { useDragDropContext } from '@kbn/dom-drag-drop';
 import { DataViewType, type DataView, type DataViewField } from '@kbn/data-views-plugin/public';
+import { fieldSupportsBreakdown } from '@kbn/field-utils';
 import { SHOW_FIELD_STATISTICS, SORT_DEFAULT_ORDER_SETTING } from '@kbn/discover-utils';
 import type { UseColumnsProps } from '@kbn/unified-data-table';
 import { popularizeField, useColumns } from '@kbn/unified-data-table';
@@ -302,6 +303,14 @@ export function DiscoverLayout() {
     [dispatch, updateAppState]
   );
 
+  const fieldSupportsBreakdownOverride = useMemo(() => {
+    if (!isEsqlMode && dataView.isTSDBMode()) {
+      return (field: DataViewField) =>
+        fieldSupportsBreakdown(field) && field.timeSeriesDimension === true;
+    }
+    return undefined;
+  }, [isEsqlMode, dataView]);
+
   const updateAdHocDataViewId = useCurrentTabAction(internalStateActions.updateAdHocDataViewId);
   const onFieldEdited: (options: {
     editedDataView: DataView;
@@ -483,6 +492,7 @@ export function DiscoverLayout() {
               <SidebarMemoized
                 columns={currentColumns}
                 documents$={dataStateContainer.data$.documents$}
+                fieldSupportsBreakdownOverride={fieldSupportsBreakdownOverride}
                 onAddBreakdownField={canSetBreakdownField ? onAddBreakdownField : undefined}
                 onAddField={onAddColumnWithTracking}
                 onAddFilter={onFilter}

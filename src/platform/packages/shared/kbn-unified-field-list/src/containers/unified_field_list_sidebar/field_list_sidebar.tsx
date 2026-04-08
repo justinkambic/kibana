@@ -52,6 +52,7 @@ export type UnifiedFieldListSidebarCustomizableProps = Pick<
   | 'onAddFieldToWorkspace'
   | 'onRemoveFieldFromWorkspace'
   | 'additionalFilters'
+  | 'fieldSupportsBreakdownOverride'
 > & {
   /**
    * All fields: fields from data view and unmapped fields or columns from text-based search
@@ -171,6 +172,7 @@ export const UnifiedFieldListSidebarComponent: React.FC<UnifiedFieldListSidebarP
   onToggleSidebar,
   additionalFilters,
   additionalFieldGroups,
+  fieldSupportsBreakdownOverride,
 }) => {
   const styles = useMemoCss(componentStyles);
 
@@ -275,6 +277,7 @@ export const UnifiedFieldListSidebarComponent: React.FC<UnifiedFieldListSidebarP
           }
           itemIndex={itemIndex}
           multiFields={multiFieldsMap?.get(field.name)} // ideally we better calculate multifields when they are requested first from the popover
+          fieldSupportsBreakdownOverride={fieldSupportsBreakdownOverride}
           onAddBreakdownField={onAddBreakdownField}
           onAddFieldToWorkspace={onAddFieldToWorkspace}
           onAddFilter={onAddFilter}
@@ -308,6 +311,7 @@ export const UnifiedFieldListSidebarComponent: React.FC<UnifiedFieldListSidebarP
       workspaceSelectedFieldNames,
       selectedFieldsState.selectedFieldsMap,
       additionalFilters,
+      fieldSupportsBreakdownOverride,
     ]
   );
 

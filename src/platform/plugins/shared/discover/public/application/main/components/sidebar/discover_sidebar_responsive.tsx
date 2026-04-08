@@ -106,6 +106,12 @@ export interface DiscoverSidebarResponsiveProps {
    */
   onAddBreakdownField?: (breakdownField: DataViewField | undefined) => void;
   /**
+   * Optional override for the default `fieldSupportsBreakdown` check.
+   * When provided, this function is used instead of the default to determine
+   * whether the breakdown action icon should be shown for a field.
+   */
+  fieldSupportsBreakdownOverride?: (field: DataViewField) => boolean;
+  /**
    * Callback function when selecting a field
    */
   onAddField: (fieldName: string) => void;
@@ -182,6 +188,7 @@ export function DiscoverSidebarResponsive(props: DiscoverSidebarResponsiveProps)
     onRemoveField,
     sidebarToggleState$,
     additionalFilters,
+    fieldSupportsBreakdownOverride,
   } = props;
   const [sidebarState, dispatchSidebarStateAction] = useReducer(
     discoverSidebarReducer,
@@ -424,6 +431,7 @@ export function DiscoverSidebarResponsive(props: DiscoverSidebarResponsiveProps)
             additionalFilters={additionalFilters}
             allFields={sidebarState.allFields}
             dataView={selectedDataView}
+            fieldSupportsBreakdownOverride={fieldSupportsBreakdownOverride}
             fullWidth
             getCreationOptions={getCreationOptions}
             onAddBreakdownField={onAddBreakdownField}

@@ -211,6 +211,12 @@ export interface UnifiedFieldListItemProps {
    * Custom filters to apply for the field list, ex: namespace custom filter
    */
   additionalFilters?: Filter[];
+  /**
+   * Optional override for the default `fieldSupportsBreakdown` check.
+   * When provided, this function is used instead of the default to determine
+   * whether the breakdown action icon should be shown for a field.
+   */
+  fieldSupportsBreakdownOverride?: (field: DataViewField) => boolean;
 }
 
 function UnifiedFieldListItemComponent({
@@ -236,11 +242,14 @@ function UnifiedFieldListItemComponent({
   itemIndex,
   size,
   additionalFilters,
+  fieldSupportsBreakdownOverride,
 }: UnifiedFieldListItemProps) {
   const [infoIsOpen, setOpen] = useState(false);
 
   const isBreakdownSupported =
-    searchMode === 'documents' ? fieldSupportsBreakdown(field) : isESQLFieldGroupable(field);
+    searchMode === 'documents'
+      ? (fieldSupportsBreakdownOverride ?? fieldSupportsBreakdown)(field)
+      : isESQLFieldGroupable(field);
 
   const addFilterAndClosePopover: typeof onAddFilter | undefined = useMemo(
     () =>

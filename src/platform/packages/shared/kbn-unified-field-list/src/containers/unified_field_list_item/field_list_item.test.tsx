@@ -45,11 +45,13 @@ async function getComponent({
   field,
   canFilter = true,
   isBreakdownSupported = true,
+  fieldSupportsBreakdownOverride,
 }: {
   selected?: boolean;
   field?: DataViewField;
   canFilter?: boolean;
   isBreakdownSupported?: boolean;
+  fieldSupportsBreakdownOverride?: (f: DataViewField) => boolean;
 }) {
   const finalField =
     field ??
@@ -80,6 +82,7 @@ async function getComponent({
     field: finalField,
     ...(canFilter && { onAddFilter: jest.fn() }),
     ...(isBreakdownSupported && { onAddBreakdownField: jest.fn() }),
+    ...(fieldSupportsBreakdownOverride && { fieldSupportsBreakdownOverride }),
     onAddFieldToWorkspace: jest.fn(),
     onRemoveFieldFromWorkspace: jest.fn(),
     onEditField: jest.fn(),
@@ -284,5 +287,91 @@ describe('UnifiedFieldListItem', function () {
     expect(
       comp.find('[data-test-subj="fieldPopoverHeader_addField-extension.keyword"]').exists()
     ).toBeFalsy();
+  });
+
+  it('should hide breakdown icon when fieldSupportsBreakdownOverride returns false', async function () {
+    const field = new DataViewField({
+      name: 'agent.id',
+      type: 'string',
+      esTypes: ['keyword'],
+      aggregatable: true,
+      searchable: true,
+    });
+
+    const { comp } = await getComponent({
+      field,
+      isBreakdownSupported: true,
+      fieldSupportsBreakdownOverride: () => false,
+    });
+
+    await act(async () => {
+      const fieldItem = findTestSubject(comp, 'field-agent.id-showDetails');
+      await fieldItem.simulate('click');
+      await comp.update();
+    });
+
+    await comp.update();
+
+    expect(
+      comp.find('[data-test-subj="fieldPopoverHeader_addBreakdownField-agent.id"]').exists()
+    ).toBeFalsy();
+  });
+
+  it('should show breakdown icon when fieldSupportsBreakdownOverride returns true', async function () {
+    const field = new DataViewField({
+      name: 'agent.id',
+      type: 'string',
+      esTypes: ['keyword'],
+      aggregatable: true,
+      searchable: true,
+    });
+
+    const { comp } = await getComponent({
+      field,
+      isBreakdownSupported: true,
+      fieldSupportsBreakdownOverride: () => true,
+    });
+
+    await act(async () => {
+      const fieldItem = findTestSubject(comp, 'field-agent.id-showDetails');
+      await fieldItem.simulate('click');
+      await comp.update();
+    });
+
+    await comp.update();
+
+    expect(
+      comp.find('[data-test-subj="fieldPopoverHeader_addBreakdownField-agent.id"]').exists()
+    ).toBeTruthy();
+  });
+
+  it('should use default fieldSupportsBreakdown when override is not provided', async function () {
+    const field = new DataViewField({
+      name: 'extension.keyword',
+      type: 'string',
+      esTypes: ['keyword'],
+      aggregatable: true,
+      searchable: true,
+    });
+
+    const { comp } = await getComponent({
+      field,
+      isBreakdownSupported: true,
+    });
+
+    await act(async () => {
+      const fieldItem = findTestSubject(comp, 'field-extension.keyword-showDetails');
+      await fieldItem.simulate('click');
+      await comp.update();
+    });
+
+    await comp.update();
+
+    // Default behavior: fieldSupportsBreakdown returns true for aggregatable keyword fields
+    expect(
+      comp
+        .find('[data-test-subj="fieldPopoverHeader_addBreakdownField-extension.keyword"]')
+        .exists()
+    ).toBeTruthy();
   });
 });
