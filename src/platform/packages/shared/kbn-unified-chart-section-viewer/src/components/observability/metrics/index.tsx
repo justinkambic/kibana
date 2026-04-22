@@ -9,6 +9,10 @@
 
 import React from 'react';
 import { PerformanceContextProvider } from '@kbn/ebt-tools';
+import {
+  KibanaErrorBoundaryProvider,
+  KibanaSectionErrorBoundary,
+} from '@kbn/shared-ux-error-boundary';
 import { MetricsExperienceGrid } from './metrics_experience_grid';
 import { withRestorableState } from '../../../restorable_state';
 import { MetricsExperienceStateProvider } from './context/metrics_experience_state_provider';
@@ -30,9 +34,13 @@ const InternalUnifiedMetricsExperienceGrid = (props: UnifiedMetricsGridProps) =>
 
 const InternalUnifiedMetricsExperienceGridWithState = (props: UnifiedMetricsGridProps) => {
   return (
-    <MetricsExperienceStateProvider profileId={props.profileId}>
-      <InternalUnifiedMetricsExperienceGrid {...props} />
-    </MetricsExperienceStateProvider>
+    <KibanaErrorBoundaryProvider analytics={props.services.analytics}>
+      <KibanaSectionErrorBoundary sectionName="metricsExperienceGrid">
+        <MetricsExperienceStateProvider profileId={props.profileId}>
+          <InternalUnifiedMetricsExperienceGrid {...props} />
+        </MetricsExperienceStateProvider>
+      </KibanaSectionErrorBoundary>
+    </KibanaErrorBoundaryProvider>
   );
 };
 
