@@ -14,6 +14,7 @@ import type { Tag } from '../types';
 import { INDEX_PATTERN_TYPE } from '../types';
 import type { MatchedItem, ResolveIndexResponse } from '../types';
 import { ResolveIndexResponseItemIndexAttrs } from '../types';
+import { ALIAS_TAG_KEY, DATA_STREAM_TAG_KEY, FROZEN_TAG_KEY, INDEX_TAG_KEY } from './tag_keys';
 
 const aliasLabel = i18n.translate('dataViews.aliasLabel', { defaultMessage: 'Alias' });
 const dataStreamLabel = i18n.translate('dataViews.dataStreamLabel', {
@@ -129,7 +130,7 @@ export const responseToItemArray = (
   const source: MatchedItem[] = [];
 
   (response.indices || []).forEach((index) => {
-    const tags: MatchedItem['tags'] = [{ key: 'index', name: indexLabel, color: 'default' }];
+    const tags: MatchedItem['tags'] = [{ key: INDEX_TAG_KEY, name: indexLabel, color: 'default' }];
     const isFrozen = (index.attributes || []).includes(ResolveIndexResponseItemIndexAttrs.FROZEN);
 
     tags.push(...getTags(index.name));
@@ -137,7 +138,7 @@ export const responseToItemArray = (
       tags.push(...getTags(alias));
     });
     if (isFrozen) {
-      tags.push({ name: frozenLabel, key: 'frozen', color: 'danger' });
+      tags.push({ name: frozenLabel, key: FROZEN_TAG_KEY, color: 'danger' });
     }
 
     source.push({
@@ -147,20 +148,20 @@ export const responseToItemArray = (
     });
   });
   (response.aliases || []).forEach((alias) => {
-    const item = {
-      name: alias.name,
-      tags: [{ key: 'alias', name: aliasLabel, color: 'default' }],
-      item: alias,
-    };
+    const tags: MatchedItem['tags'] = [{ key: ALIAS_TAG_KEY, name: aliasLabel, color: 'default' }];
     // we only need to check the first index to see if its a rollup since there can only be one alias match
-    item.tags.push(...getTags(alias.indices[0]));
-    item.tags.push(...getTags(alias.name));
-    source.push(item);
+    tags.push(...getTags(alias.indices[0]));
+    tags.push(...getTags(alias.name));
+    source.push({
+      name: alias.name,
+      tags,
+      item: alias,
+    });
   });
   (response.data_streams || []).forEach((dataStream) => {
     source.push({
       name: dataStream.name,
-      tags: [{ key: 'data_stream', name: dataStreamLabel, color: 'primary' }],
+      tags: [{ key: DATA_STREAM_TAG_KEY, name: dataStreamLabel, color: 'primary' }],
       item: dataStream,
     });
   });

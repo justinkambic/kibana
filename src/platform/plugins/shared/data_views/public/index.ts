@@ -44,6 +44,16 @@ export type {
 
 export { INDEX_PATTERN_TYPE } from './types';
 
+// Tag keys emitted by `getIndices` / `responseToItemArray` for `_resolve/index`
+// responses. Consumers comparing `MatchedItem['tags'][number].key` should
+// import these constants instead of hardcoding the literals.
+export {
+  INDEX_TAG_KEY,
+  ALIAS_TAG_KEY,
+  DATA_STREAM_TAG_KEY,
+  FROZEN_TAG_KEY,
+} from './services/tag_keys';
+
 export type {
   DataViewsServicePublic,
   DataViewsServicePublicDeps,

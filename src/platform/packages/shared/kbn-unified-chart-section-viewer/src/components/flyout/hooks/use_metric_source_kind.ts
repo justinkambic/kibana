@@ -7,19 +7,18 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import type { DataViewsPublicPluginStart, MatchedItem } from '@kbn/data-views-plugin/public';
+import {
+  DATA_STREAM_TAG_KEY,
+  INDEX_TAG_KEY,
+  type DataViewsPublicPluginStart,
+  type MatchedItem,
+} from '@kbn/data-views-plugin/public';
 import { useAbortableAsync } from '@kbn/react-hooks';
 import { useExternalServices } from '../../../context/external_services';
 
-// Tag key emitted by data_views.getIndices() / responseToItemArray for plain
-// indices (vs data streams). Coupled to that plugin's response shape.
-// TODO: import from @kbn/data-views-plugin once exported
-// (https://github.com/elastic/kibana/issues/265126).
-const DATA_VIEWS_INDEX_TAG_KEY = 'index';
-
 export const METRIC_SOURCE_KIND = {
-  DATA_STREAM: 'data_stream',
-  INDEX: 'index',
+  DATA_STREAM: DATA_STREAM_TAG_KEY,
+  INDEX: INDEX_TAG_KEY,
 } as const;
 
 export type MetricSourceKind = (typeof METRIC_SOURCE_KIND)[keyof typeof METRIC_SOURCE_KIND];
@@ -122,7 +121,7 @@ const fetchSourceKind = async (
   });
   const item = matched.find((m) => m.name === name);
   if (!item) return undefined;
-  return item.tags.some((t) => t.key === DATA_VIEWS_INDEX_TAG_KEY)
+  return item.tags.some((t) => t.key === INDEX_TAG_KEY)
     ? METRIC_SOURCE_KIND.INDEX
     : METRIC_SOURCE_KIND.DATA_STREAM;
 };
