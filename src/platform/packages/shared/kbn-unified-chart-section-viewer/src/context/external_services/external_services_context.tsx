@@ -7,7 +7,7 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import type { DocLinksStart, NotificationsStart } from '@kbn/core/public';
+import type { DocLinksStart, HttpStart, NotificationsStart } from '@kbn/core/public';
 import type { DiscoverSharedPublicStart } from '@kbn/discover-shared-plugin/public';
 import type { DataViewsPublicPluginStart } from '@kbn/data-views-plugin/public';
 import type { Logger } from '@kbn/logging';
@@ -21,6 +21,12 @@ export interface ExternalServices {
   /** Host doc links for Discover ErrorCallout ES|QL reference footer. */
   docLinks?: DocLinksStart;
   logger?: Logger;
+  /**
+   * Kibana core HTTP client. When present, the metrics grid can make
+   * secondary requests (e.g. alerting rules) to compute relevance scores.
+   * Deliberately optional: omitting it disables relevance sort gracefully.
+   */
+  http?: HttpStart;
 }
 
 const ExternalServicesContext = createContext<ExternalServices | undefined>(undefined);

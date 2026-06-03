@@ -14,6 +14,8 @@ import {
   type FlyoutState,
   type FlyoutTabId,
   type MetricsExperienceRestorableState,
+  type MetricsSortDirection,
+  type MetricsSortType,
   useRestorableState,
 } from '../../../../../restorable_state';
 
@@ -25,6 +27,8 @@ export interface MetricsExperienceStateContextValue extends MetricsExperienceRes
   onToggleFullscreen: () => void;
   onFlyoutStateChange: (value: FlyoutState | undefined) => void;
   onFlyoutSelectedTabChange: (value: FlyoutTabId) => void;
+  onSortTypeChange: (value: MetricsSortType) => void;
+  onSortDirectionChange: (value: MetricsSortDirection) => void;
 }
 
 export const MetricsExperienceStateContext =
@@ -42,6 +46,11 @@ export function MetricsExperienceStateProvider({
   const [searchTerm, setSearchTerm] = useRestorableState('searchTerm', '');
   const [isFullscreen, setIsFullscreen] = useRestorableState('isFullscreen', false);
   const [flyoutState, setFlyoutState] = useRestorableState('flyoutState', undefined);
+  const [sortType, setSortType] = useRestorableState('sortType', 'alphabetical' as MetricsSortType);
+  const [sortDirection, setSortDirection] = useRestorableState(
+    'sortDirection',
+    'asc' as MetricsSortDirection
+  );
 
   const onDimensionsChange = useCallback(
     (nextDimensions: Dimension[]) => {
@@ -87,6 +96,20 @@ export function MetricsExperienceStateProvider({
     [setFlyoutState]
   );
 
+  const onSortTypeChange = useCallback(
+    (nextSortType: MetricsSortType) => {
+      setSortType(nextSortType);
+    },
+    [setSortType]
+  );
+
+  const onSortDirectionChange = useCallback(
+    (nextSortDirection: MetricsSortDirection) => {
+      setSortDirection(nextSortDirection);
+    },
+    [setSortDirection]
+  );
+
   return (
     <MetricsExperienceStateContext.Provider
       value={{
@@ -96,12 +119,16 @@ export function MetricsExperienceStateProvider({
         searchTerm,
         selectedDimensions,
         flyoutState,
+        sortType,
+        sortDirection,
         onPageChange,
         onDimensionsChange,
         onSearchTermChange,
         onToggleFullscreen,
         onFlyoutStateChange,
         onFlyoutSelectedTabChange,
+        onSortTypeChange,
+        onSortDirectionChange,
       }}
     >
       {children}

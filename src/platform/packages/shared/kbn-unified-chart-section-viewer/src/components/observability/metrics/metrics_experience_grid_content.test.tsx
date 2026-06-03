@@ -126,6 +126,10 @@ describe('MetricsExperienceGridContent', () => {
       onFlyoutStateChange: jest.fn(),
       onFlyoutSelectedTabChange: jest.fn(),
       profileId: 'test-profile-id',
+      sortType: 'alphabetical',
+      sortDirection: 'asc',
+      onSortTypeChange: jest.fn(),
+      onSortDirectionChange: jest.fn(),
     });
 
     usePaginationMock.mockReturnValue({
@@ -189,6 +193,10 @@ describe('MetricsExperienceGridContent', () => {
       onFlyoutStateChange: jest.fn(),
       onFlyoutSelectedTabChange: jest.fn(),
       profileId: 'test-profile-id',
+      sortType: 'alphabetical',
+      sortDirection: 'asc',
+      onSortTypeChange: jest.fn(),
+      onSortDirectionChange: jest.fn(),
     });
 
     const cpuMetricItems = allFieldsSomeWithCpu.filter((f) => f.metricName.includes('cpu'));

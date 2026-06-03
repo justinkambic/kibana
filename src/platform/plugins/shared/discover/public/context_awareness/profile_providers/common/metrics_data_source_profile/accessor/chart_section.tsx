@@ -40,6 +40,12 @@ const MetricsExperienceGridWrapper = (
     [dispatch, updateAppState]
   );
 
+  // SPIKE: inject `http` so the chart section can make secondary requests
+  // (e.g. alerting rules for relevance sort).  `http` is already available on
+  // DiscoverServices; we just need to thread it through ExternalServices.
+  // This is the only change required on our side — no Discover-team code is touched.
+  const { http } = useDiscoverServices();
+
   const externalServices = useMemo(
     () => ({
       discoverShared,
@@ -47,8 +53,9 @@ const MetricsExperienceGridWrapper = (
       notifications,
       docLinks,
       logger: logger.get(METRICS_DATA_SOURCE_PROFILE_ID),
+      http,
     }),
-    [discoverShared, dataViews, notifications, docLinks, logger]
+    [discoverShared, dataViews, notifications, docLinks, logger, http]
   );
 
   return (

@@ -23,6 +23,9 @@ export interface FlyoutState {
   readonly selectedTabId?: FlyoutTabId;
 }
 
+export type MetricsSortType = 'alphabetical' | 'relevance';
+export type MetricsSortDirection = 'asc' | 'desc';
+
 export interface MetricsExperienceRestorableState {
   // Pagination page index
   currentPage: number;
@@ -38,6 +41,10 @@ export interface MetricsExperienceRestorableState {
 
   // Open metric details flyout state, persisted across navigation.
   flyoutState?: FlyoutState;
+
+  // Sort type and direction
+  sortType: MetricsSortType;
+  sortDirection: MetricsSortDirection;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

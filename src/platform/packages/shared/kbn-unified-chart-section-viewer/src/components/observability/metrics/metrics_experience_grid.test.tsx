@@ -258,6 +258,10 @@ describe('MetricsExperienceGrid', () => {
       onFlyoutStateChange: jest.fn(),
       onFlyoutSelectedTabChange: jest.fn(),
       profileId: 'test-profile-id',
+      sortType: 'alphabetical',
+      sortDirection: 'asc',
+      onSortTypeChange: jest.fn(),
+      onSortDirectionChange: jest.fn(),
     });
 
     useFetchMetricsDataMock.mockReturnValue({
@@ -433,6 +437,10 @@ describe('MetricsExperienceGrid', () => {
       onFlyoutStateChange: jest.fn(),
       onFlyoutSelectedTabChange: jest.fn(),
       profileId: 'test-profile-id',
+      sortType: 'alphabetical',
+      sortDirection: 'asc',
+      onSortTypeChange: jest.fn(),
+      onSortDirectionChange: jest.fn(),
     });
 
     const { getByTestId } = render(<MetricsExperienceGrid {...defaultProps} />, {
@@ -479,6 +487,10 @@ describe('MetricsExperienceGrid', () => {
       onFlyoutStateChange: jest.fn(),
       onFlyoutSelectedTabChange: jest.fn(),
       profileId: 'test-profile-id',
+      sortType: 'alphabetical',
+      sortDirection: 'asc',
+      onSortTypeChange: jest.fn(),
+      onSortDirectionChange: jest.fn(),
     });
 
     const { getByTestId } = render(<MetricsExperienceGrid {...defaultProps} />, {
@@ -520,6 +532,10 @@ describe('MetricsExperienceGrid', () => {
         onFlyoutStateChange: jest.fn(),
         onFlyoutSelectedTabChange: jest.fn(),
         profileId: 'test-profile-id',
+        sortType: 'alphabetical',
+        sortDirection: 'asc',
+        onSortTypeChange: jest.fn(),
+        onSortDirectionChange: jest.fn(),
       });
 
       // Stream's universe only has `host.name`; `environment` is mapped but
@@ -560,6 +576,10 @@ describe('MetricsExperienceGrid', () => {
         onFlyoutStateChange: jest.fn(),
         onFlyoutSelectedTabChange: jest.fn(),
         profileId: 'test-profile-id',
+        sortType: 'alphabetical',
+        sortDirection: 'asc',
+        onSortTypeChange: jest.fn(),
+        onSortDirectionChange: jest.fn(),
       });
 
       useFetchMetricsDataMock.mockReturnValue({
@@ -605,6 +625,10 @@ describe('MetricsExperienceGrid', () => {
         onFlyoutStateChange: jest.fn(),
         onFlyoutSelectedTabChange: jest.fn(),
         profileId: 'test-profile-id',
+        sortType: 'alphabetical',
+        sortDirection: 'asc',
+        onSortTypeChange: jest.fn(),
+        onSortDirectionChange: jest.fn(),
       });
 
       const { getByTestId } = render(

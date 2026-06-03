@@ -114,10 +114,10 @@ export function useFetchMetricsData({
 
       const parsed = parseMetricsWithTelemetry(documents, getFieldType);
 
-      const sortedMetrics: ParsedMetrics = {
-        metricItems: [...parsed.metricItems].sort((a, b) =>
-          a.metricName.localeCompare(b.metricName)
-        ),
+      // Dimensions are still sorted here since that's UI-structural, not user-facing sort order.
+      // metricItems are returned in fetch order so the caller can apply its sort strategy.
+      const processedMetrics: ParsedMetrics = {
+        metricItems: parsed.metricItems,
         allDimensions: [...parsed.allDimensions].sort((a, b) => a.name.localeCompare(b.name)),
       };
 
@@ -126,7 +126,7 @@ export function useFetchMetricsData({
       }
 
       return {
-        ...sortedMetrics,
+        ...processedMetrics,
         activeDimensions: appliedDimensions ?? [],
       };
     },

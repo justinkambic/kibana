@@ -7,20 +7,23 @@
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { keys } from '@elastic/eui';
 import { usePerformanceContext } from '@kbn/ebt-tools';
 import { i18n } from '@kbn/i18n';
 import { useFetchMetricsData } from './hooks/use_fetch_metrics_data';
+import { useMetricsRelevanceScores } from './hooks/use_metrics_relevance_scores';
 import { METRICS_BREAKDOWN_SELECTOR_DATA_TEST_SUBJ } from '../../../common/constants';
 import { useMetricsExperienceState } from './context/metrics_experience_state_provider';
+import { useExternalServices } from '../../../context/external_services';
 import { ChartsGrid } from '../../charts_grid';
 import { EmptyState } from '../../empty_state/empty_state';
 import { useToolbarActions } from '../../toolbar/hooks/use_toolbar_actions';
 import { SearchButton } from '../../toolbar/right_side_actions/search_button';
+import { SortSelector } from '../../toolbar/sort_selector';
 import { MetricsExperienceGridContent } from './metrics_experience_grid_content';
 import { ChartSectionSearchError } from '../../chart_section_search_error/chart_section_search_error';
-import type { Dimension, UnifiedMetricsGridProps } from '../../../types';
+import type { Dimension, ParsedMetricItem, UnifiedMetricsGridProps } from '../../../types';
 import {
   useDimensionsWipe,
   useDiscoverFieldForBreakdown,
@@ -53,7 +56,14 @@ export const MetricsExperienceGrid = ({
     onDimensionsChange,
     onPageChange,
     profileId,
+    sortType,
+    sortDirection,
+    onSortTypeChange,
+    onSortDirectionChange,
   } = useMetricsExperienceState();
+
+  const externalServices = useExternalServices();
+  const http = externalServices?.http;
 
   const {
     metricItems,
@@ -73,6 +83,18 @@ export const MetricsExperienceGrid = ({
     metricItems,
     searchTerm,
   });
+
+  const metricNames = useMemo(() => metricItems.map((m) => m.metricName), [metricItems]);
+
+  const { scores: relevanceScores } = useMetricsRelevanceScores({
+    metricNames,
+    http,
+  });
+
+  const sortedMetricItems = useMemo(
+    () => applySortToMetrics(filteredMetricItems, sortType, sortDirection, relevanceScores),
+    [filteredMetricItems, sortType, sortDirection, relevanceScores]
+  );
 
   useDiscoverFieldForBreakdown(
     breakdownField,
@@ -169,13 +191,22 @@ export const MetricsExperienceGrid = ({
         rightSide: rightSideActions,
         additionalControls: {
           prependRight: (
-            <SearchButton
-              isFullscreen={isFullscreen}
-              value={searchTerm}
-              onSearchTermChange={onSearchTermChange}
-              onKeyDown={onKeyDown}
-              data-test-subj="metricsExperienceGridToolbarSearch"
-            />
+            <>
+              <SortSelector
+                sortType={sortType}
+                sortDirection={sortDirection}
+                onSortTypeChange={onSortTypeChange}
+                onSortDirectionChange={onSortDirectionChange}
+                hasRelevanceData={http != null}
+              />
+              <SearchButton
+                isFullscreen={isFullscreen}
+                value={searchTerm}
+                onSearchTermChange={onSearchTermChange}
+                onKeyDown={onKeyDown}
+                data-test-subj="metricsExperienceGridToolbarSearch"
+              />
+            </>
           ),
         },
       }}
@@ -185,7 +216,7 @@ export const MetricsExperienceGrid = ({
       onKeyDown={onKeyDown}
     >
       <MetricsExperienceGridContent
-        metricItems={filteredMetricItems}
+        metricItems={sortedMetricItems}
         activeDimensions={activeDimensions}
         services={services}
         discoverFetch$={discoverFetch$}
@@ -200,6 +231,28 @@ export const MetricsExperienceGrid = ({
     </ChartsGrid>
   );
 };
+
+function applySortToMetrics(
+  items: ParsedMetricItem[],
+  sortType: string,
+  sortDirection: string,
+  relevanceScores: Map<string, number>
+): ParsedMetricItem[] {
+  if (sortType === 'relevance') {
+    return [...items].sort((a, b) => {
+      const scoreA = relevanceScores.get(a.metricName) ?? 0;
+      const scoreB = relevanceScores.get(b.metricName) ?? 0;
+      // Higher score = more relevant = should appear first (desc by score).
+      if (scoreB !== scoreA) return scoreB - scoreA;
+      // Stable tiebreak: alphabetical within same relevance tier.
+      return a.metricName.localeCompare(b.metricName);
+    });
+  }
+
+  // Alphabetical sort (default).
+  const sorted = [...items].sort((a, b) => a.metricName.localeCompare(b.metricName));
+  return sortDirection === 'desc' ? sorted.reverse() : sorted;
+}
 
 const areSelectorPortalsOpen = () => {
   const portals = document.querySelectorAll('[data-euiportal]');
