@@ -8,14 +8,11 @@
  */
 
 import { getChangedSettings } from './get_changed_settings';
-import type { MetricsGridSettings } from '@kbn/discover-utils';
+import { METRICS_GRID_SETTINGS_DEFAULTS, type MetricsGridSettings } from '@kbn/discover-utils';
 
 const applied: MetricsGridSettings = {
-  counterAggregation: 'sum',
-  gaugeAggregation: 'avg',
-  histogramPercentile: 'p95',
+  ...METRICS_GRID_SETTINGS_DEFAULTS,
   dimensions: ['host.name'],
-  searchTerm: '',
 };
 
 describe('getChangedSettings', () => {
@@ -31,11 +28,9 @@ describe('getChangedSettings', () => {
 
   it('returns every field that changed across all three settings', () => {
     const draft: MetricsGridSettings = {
-      counterAggregation: 'sum',
+      ...applied,
       gaugeAggregation: 'min',
       histogramPercentile: 'p90',
-      dimensions: ['host.name'],
-      searchTerm: '',
     };
 
     expect(getChangedSettings(draft, applied)).toEqual({

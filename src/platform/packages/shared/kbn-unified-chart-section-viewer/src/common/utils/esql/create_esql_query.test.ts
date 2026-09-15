@@ -6,6 +6,7 @@
  * your election, the "Elastic License 2.0", the "GNU Affero General Public
  * License v3.0 only", or the "Server Side Public License, v 1".
  */
+import { METRICS_GRID_SETTINGS_DEFAULTS } from '@kbn/discover-utils';
 import type { ParsedMetricItem } from '../../../types';
 import { createESQLQuery as createESQLQueryWithSettings } from './create_esql_query';
 import { ES_FIELD_TYPES } from '@kbn/field-types';
@@ -653,11 +654,8 @@ TS edge-case-gauge-to-counter
       const query = createESQLQuery({
         metricItem: mockCounterMetric,
         gridSettings: {
+          ...METRICS_GRID_SETTINGS_DEFAULTS,
           counterAggregation: 'max',
-          gaugeAggregation: 'avg',
-          histogramPercentile: 'p95',
-          dimensions: [],
-          searchTerm: '',
         },
       });
       expect(query).toBe(
@@ -672,11 +670,8 @@ TS metrics-*
       const query = createESQLQuery({
         metricItem: { ...mockMetric, metricTypes: ['gauge'] },
         gridSettings: {
-          counterAggregation: 'sum',
+          ...METRICS_GRID_SETTINGS_DEFAULTS,
           gaugeAggregation: 'sum',
-          histogramPercentile: 'p95',
-          dimensions: [],
-          searchTerm: '',
         },
       });
       expect(query).toBe(
@@ -691,11 +686,8 @@ TS metrics-*
       const query = createESQLQuery({
         metricItem: mockLegacyHistogramMetric,
         gridSettings: {
-          counterAggregation: 'sum',
-          gaugeAggregation: 'avg',
+          ...METRICS_GRID_SETTINGS_DEFAULTS,
           histogramPercentile: 'p90',
-          dimensions: [],
-          searchTerm: '',
         },
       });
       expect(query).toBe(
@@ -710,11 +702,8 @@ TS metrics-*
       const query = createESQLQuery({
         metricItem: mockTdigestMetric,
         gridSettings: {
-          counterAggregation: 'sum',
-          gaugeAggregation: 'avg',
+          ...METRICS_GRID_SETTINGS_DEFAULTS,
           histogramPercentile: 'p50',
-          dimensions: [],
-          searchTerm: '',
         },
       });
       expect(query).toBe(

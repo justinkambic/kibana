@@ -9,6 +9,7 @@
 
 import {
   METRICS_GRID_HISTOGRAM_PERCENTILES,
+  METRICS_GRID_SETTINGS_DEFAULTS,
   METRICS_GRID_SIMPLE_AGGREGATIONS,
 } from './metrics_grid_settings';
 
@@ -19,5 +20,11 @@ describe('metrics grid settings', () => {
 
   it('exposes exactly the five histogram percentile options', () => {
     expect(METRICS_GRID_HISTOGRAM_PERCENTILES).toEqual(['p50', 'p75', 'p90', 'p95', 'p99']);
+  });
+
+  it('shows exemplars by default', () => {
+    // The setting is named negatively so that its default is `false` and therefore gets
+    // stripped from the URL and local tab storage rather than appearing in every session.
+    expect(METRICS_GRID_SETTINGS_DEFAULTS.hideExemplars).toBe(false);
   });
 });

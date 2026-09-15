@@ -8,6 +8,7 @@
  */
 
 import { renderHook } from '@testing-library/react';
+import { METRICS_GRID_SETTINGS_DEFAULTS } from '@kbn/discover-utils';
 import type { MetricUnit, NullableMetricUnit } from '../../../types';
 import { useChartLayers } from './use_chart_layers';
 import { createMetricAggregation } from '../../../common/utils';
@@ -191,11 +192,8 @@ describe('useChartLayers', () => {
 
   it('forwards gridSettings to createMetricAggregation', () => {
     const gridSettings = {
+      ...METRICS_GRID_SETTINGS_DEFAULTS,
       counterAggregation: 'max' as const,
-      gaugeAggregation: 'avg' as const,
-      histogramPercentile: 'p95' as const,
-      dimensions: [],
-      searchTerm: '',
     };
 
     renderHook(() =>

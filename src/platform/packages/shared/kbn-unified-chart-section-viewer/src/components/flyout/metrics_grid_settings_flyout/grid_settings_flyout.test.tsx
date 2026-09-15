@@ -12,7 +12,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EuiSuperSelectTestHarness } from '@kbn/test-eui-helpers';
 import { GridSettingsFlyout } from './grid_settings_flyout';
-import type { MetricsGridSettings } from '@kbn/discover-utils';
+import { METRICS_GRID_SETTINGS_DEFAULTS, type MetricsGridSettings } from '@kbn/discover-utils';
 
 const mockTrackAggregationConfigChanged = jest.fn();
 
@@ -22,13 +22,7 @@ jest.mock('../../../context/ebt_telemetry_context', () => ({
   }),
 }));
 
-const defaultSettings: MetricsGridSettings = {
-  counterAggregation: 'sum',
-  gaugeAggregation: 'avg',
-  histogramPercentile: 'p95',
-  dimensions: [],
-  searchTerm: '',
-};
+const defaultSettings: MetricsGridSettings = { ...METRICS_GRID_SETTINGS_DEFAULTS };
 
 const counterSelect = new EuiSuperSelectTestHarness('metricsExperienceGridSettingsCounterSelect');
 const gaugeSelect = new EuiSuperSelectTestHarness('metricsExperienceGridSettingsGaugeSelect');

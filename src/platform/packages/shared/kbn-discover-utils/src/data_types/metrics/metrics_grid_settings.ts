@@ -53,6 +53,12 @@ export interface MetricsGridSettings extends SerializableRecord {
   counterAggregation: SimpleAggregation;
   gaugeAggregation: SimpleAggregation;
   histogramPercentile: HistogramPercentile;
+  /**
+   * Grid-level toggle suppressing exemplar rendering across every chart in the grid. Phrased
+   * negatively so that the default (`false`) is stripped from the URL and local tab storage,
+   * keeping a shared Discover link clean unless the user has actively hidden exemplars.
+   */
+  hideExemplars: boolean;
   dimensions: string[];
   searchTerm: string;
 }
@@ -61,6 +67,7 @@ export const METRICS_GRID_SETTINGS_DEFAULTS: MetricsGridSettings = {
   counterAggregation: FunctionNames.SUM,
   gaugeAggregation: FunctionNames.AVG,
   histogramPercentile: 'p95',
+  hideExemplars: false,
   dimensions: [],
   searchTerm: '',
 };

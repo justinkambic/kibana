@@ -264,13 +264,7 @@ describe('MetricsExperienceStateProvider', () => {
     it('defaults to METRICS_GRID_SETTINGS_DEFAULTS when not provided', () => {
       const { result } = renderHook(() => useMetricsExperienceState(), { wrapper });
 
-      expect(result.current.gridSettings).toEqual({
-        counterAggregation: 'sum',
-        gaugeAggregation: 'avg',
-        histogramPercentile: 'p95',
-        dimensions: [],
-        searchTerm: '',
-      });
+      expect(result.current.gridSettings).toEqual(METRICS_GRID_SETTINGS_DEFAULTS);
     });
 
     it('uses the provided gridSettings instead of the defaults', () => {
@@ -278,6 +272,7 @@ describe('MetricsExperienceStateProvider', () => {
         <MetricsExperienceStateProvider
           profileId="test-profile"
           gridSettings={{
+            ...METRICS_GRID_SETTINGS_DEFAULTS,
             counterAggregation: 'max',
             gaugeAggregation: 'min',
             histogramPercentile: 'p50',
@@ -291,6 +286,7 @@ describe('MetricsExperienceStateProvider', () => {
       const { result } = renderHook(() => useMetricsExperienceState(), { wrapper: customWrapper });
 
       expect(result.current.gridSettings).toEqual({
+        ...METRICS_GRID_SETTINGS_DEFAULTS,
         counterAggregation: 'max',
         gaugeAggregation: 'min',
         histogramPercentile: 'p50',

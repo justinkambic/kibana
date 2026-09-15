@@ -20,7 +20,7 @@ import { fieldsMetadataPluginPublicMock } from '@kbn/fields-metadata-plugin/publ
 import type { UnifiedHistogramFetch$ } from '@kbn/unified-histogram/types';
 import type { UnifiedMetricsGridProps } from '../../../types';
 import { createESQLQuery } from '../../../common/utils';
-import { dismissAllFlyoutsExceptFor } from '@kbn/discover-utils';
+import { dismissAllFlyoutsExceptFor, METRICS_GRID_SETTINGS_DEFAULTS } from '@kbn/discover-utils';
 import {
   MetricsExperienceStateProvider,
   useMetricsExperienceState,
@@ -1093,11 +1093,9 @@ describe('MetricsGrid', () => {
         <MetricsExperienceStateProvider
           profileId="test-profile"
           gridSettings={{
+            ...METRICS_GRID_SETTINGS_DEFAULTS,
             counterAggregation: 'max',
-            gaugeAggregation: 'avg',
             histogramPercentile: 'p90',
-            dimensions: [],
-            searchTerm: '',
           }}
         >
           <MetricsGrid {...defaultProps} discoverFetch$={discoverFetch$} />
@@ -1111,11 +1109,9 @@ describe('MetricsGrid', () => {
         <MetricsExperienceStateProvider
           profileId="test-profile"
           gridSettings={{
+            ...METRICS_GRID_SETTINGS_DEFAULTS,
             counterAggregation: 'max',
-            gaugeAggregation: 'avg',
             histogramPercentile: 'p95',
-            dimensions: [],
-            searchTerm: '',
           }}
         >
           <MetricsGrid {...defaultProps} discoverFetch$={discoverFetch$} />
@@ -1132,11 +1128,9 @@ describe('MetricsGrid', () => {
         <MetricsExperienceStateProvider
           profileId="test-profile"
           gridSettings={{
+            ...METRICS_GRID_SETTINGS_DEFAULTS,
             counterAggregation: 'max',
-            gaugeAggregation: 'avg',
             histogramPercentile: 'p90',
-            dimensions: [],
-            searchTerm: '',
           }}
         >
           <MetricsGrid {...defaultProps} discoverFetch$={discoverFetch$} />
@@ -1146,11 +1140,9 @@ describe('MetricsGrid', () => {
       expect(createESQLQuery).toHaveBeenCalledWith(
         expect.objectContaining({
           gridSettings: {
+            ...METRICS_GRID_SETTINGS_DEFAULTS,
             counterAggregation: 'max',
-            gaugeAggregation: 'avg',
             histogramPercentile: 'p90',
-            dimensions: [],
-            searchTerm: '',
           },
         })
       );

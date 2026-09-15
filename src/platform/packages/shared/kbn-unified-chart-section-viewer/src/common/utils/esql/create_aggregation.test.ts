@@ -8,7 +8,7 @@
  */
 
 import { ES_FIELD_TYPES } from '@kbn/field-types';
-import type { SimpleAggregation } from '@kbn/discover-utils';
+import { METRICS_GRID_SETTINGS_DEFAULTS, type SimpleAggregation } from '@kbn/discover-utils';
 import { createMetricAggregation, createTimeBucketAggregation } from './create_aggregation';
 
 describe('createMetricAggregation', () => {
@@ -117,11 +117,10 @@ describe('createMetricAggregation', () => {
 
 describe('createMetricAggregation with gridSettings override', () => {
   const gridSettings = {
+    ...METRICS_GRID_SETTINGS_DEFAULTS,
     counterAggregation: 'max' as const,
     gaugeAggregation: 'min' as const,
     histogramPercentile: 'p90' as const,
-    dimensions: [],
-    searchTerm: '',
   };
 
   it('applies the counter aggregation setting wrapped in RATE()', () => {
@@ -157,11 +156,8 @@ describe('createMetricAggregation with gridSettings override', () => {
         instrument: 'gauge',
         metricName: 'cpu.usage',
         gridSettings: {
-          counterAggregation: 'sum',
+          ...METRICS_GRID_SETTINGS_DEFAULTS,
           gaugeAggregation,
-          histogramPercentile: 'p95',
-          dimensions: [],
-          searchTerm: '',
         },
       });
       expect(result).toBe(expected);
