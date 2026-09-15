@@ -39,6 +39,19 @@ describe('getChangedSettings', () => {
     });
   });
 
+  it('reports a hideExemplars flip, proving booleans are treated as flyout-owned settings', () => {
+    const draft: MetricsGridSettings = { ...applied, hideExemplars: true };
+
+    expect(getChangedSettings(draft, applied)).toEqual({ hideExemplars: true });
+  });
+
+  it('reports a hideExemplars flip back to the default', () => {
+    const hidden: MetricsGridSettings = { ...applied, hideExemplars: true };
+    const draft: MetricsGridSettings = { ...hidden, hideExemplars: false };
+
+    expect(getChangedSettings(draft, hidden)).toEqual({ hideExemplars: false });
+  });
+
   it('ignores a `dimensions` difference -- it is not a flyout-editable setting', () => {
     const draft: MetricsGridSettings = { ...applied, dimensions: ['service.name'] };
 

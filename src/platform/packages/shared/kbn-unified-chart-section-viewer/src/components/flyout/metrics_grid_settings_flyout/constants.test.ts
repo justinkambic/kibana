@@ -13,6 +13,8 @@ import {
   METRICS_GRID_SIMPLE_AGGREGATIONS,
 } from '@kbn/discover-utils';
 import {
+  AGGREGATION_SETTING_KEYS,
+  FLYOUT_SETTING_KEYS,
   HISTOGRAM_PERCENTILE_OPTIONS,
   HISTOGRAM_PERCENTILE_VALUES,
   SIMPLE_AGGREGATION_OPTIONS,
@@ -28,6 +30,21 @@ describe('grid_settings constants', () => {
       dimensions: [],
       searchTerm: '',
     });
+  });
+
+  it('owns hideExemplars as a flyout setting', () => {
+    expect(FLYOUT_SETTING_KEYS).toContain('hideExemplars');
+  });
+
+  it('excludes hideExemplars from the aggregation settings', () => {
+    // Aggregation settings drive a telemetry event carrying a required `metric_type`.
+    // `hideExemplars` has no metric type, so it must stay out of this tuple.
+    expect(AGGREGATION_SETTING_KEYS).not.toContain('hideExemplars');
+    expect(AGGREGATION_SETTING_KEYS).toEqual([
+      'counterAggregation',
+      'gaugeAggregation',
+      'histogramPercentile',
+    ]);
   });
 
   it('uses the canonical simple aggregation options', () => {

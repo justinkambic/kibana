@@ -51,4 +51,26 @@ describe('getAggregationConfigChanges', () => {
       })
     ).toEqual([]);
   });
+
+  it('excludes non-aggregation settings such as hideExemplars from the telemetry payload', () => {
+    // `metric_type` is a required keyword in the registered EBT schema. A non-aggregation
+    // setting has no metric type, so it must not produce an event at all rather than one
+    // with `metric_type: undefined` and booleans in the keyword aggregation fields.
+    expect(getAggregationConfigChanges(gridSettings, { hideExemplars: true })).toEqual([]);
+  });
+
+  it('reports only the aggregation setting when an aggregation and hideExemplars change together', () => {
+    expect(
+      getAggregationConfigChanges(gridSettings, {
+        counterAggregation: 'max',
+        hideExemplars: true,
+      })
+    ).toEqual([
+      {
+        metric_type: 'counter',
+        previous_aggregation: 'sum',
+        new_aggregation: 'max',
+      },
+    ]);
+  });
 });

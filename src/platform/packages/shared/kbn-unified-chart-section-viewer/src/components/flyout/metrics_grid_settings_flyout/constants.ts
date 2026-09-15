@@ -14,11 +14,23 @@ import {
   type MetricsGridSettings,
 } from '@kbn/discover-utils';
 
-/** Settings owned by this flyout. */
-export const FLYOUT_SETTING_KEYS = [
+/**
+ * Flyout settings that map to an aggregation-config telemetry event. Keeping these in their
+ * own tuple is what lets `getAggregationConfigChanges` iterate a known-exhaustive list rather
+ * than casting `Object.keys`, so a non-aggregation setting can never reach that payload.
+ *
+ * Do not reorder: the emitted event order is asserted by existing tests.
+ */
+export const AGGREGATION_SETTING_KEYS = [
   'counterAggregation',
   'gaugeAggregation',
   'histogramPercentile',
+] as const satisfies ReadonlyArray<keyof MetricsGridSettings>;
+
+/** Settings owned by this flyout. */
+export const FLYOUT_SETTING_KEYS = [
+  ...AGGREGATION_SETTING_KEYS,
+  'hideExemplars',
 ] as const satisfies ReadonlyArray<keyof MetricsGridSettings>;
 
 export const SIMPLE_AGGREGATION_OPTIONS = METRICS_GRID_SIMPLE_AGGREGATIONS;

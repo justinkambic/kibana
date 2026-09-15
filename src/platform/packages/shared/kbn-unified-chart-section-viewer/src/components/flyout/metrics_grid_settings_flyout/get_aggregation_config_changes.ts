@@ -12,8 +12,9 @@ import type {
   MetricAggregationConfigChangedEvent,
   MetricAggregationConfigMetricType,
 } from '../../observability/metrics/telemetry';
+import { AGGREGATION_SETTING_KEYS } from './constants';
 
-type AggregationSetting = 'counterAggregation' | 'gaugeAggregation' | 'histogramPercentile';
+type AggregationSetting = (typeof AGGREGATION_SETTING_KEYS)[number];
 
 const METRIC_TYPE_BY_SETTING: Record<AggregationSetting, MetricAggregationConfigMetricType> = {
   counterAggregation: 'counter',
@@ -21,11 +22,16 @@ const METRIC_TYPE_BY_SETTING: Record<AggregationSetting, MetricAggregationConfig
   histogramPercentile: 'histogram',
 };
 
+/**
+ * Builds the aggregation-config telemetry events for a settings update. Iterates the known
+ * aggregation settings rather than the update's own keys, so settings the flyout owns but
+ * which have no metric type (e.g. `hideExemplars`) are structurally excluded.
+ */
 export const getAggregationConfigChanges = (
   gridSettings: MetricsGridSettings,
   update: Partial<MetricsGridSettings>
 ): MetricAggregationConfigChangedEvent[] =>
-  (Object.keys(update) as AggregationSetting[]).flatMap((setting) => {
+  AGGREGATION_SETTING_KEYS.flatMap((setting) => {
     const newAggregation = update[setting];
 
     if (newAggregation === undefined) {
