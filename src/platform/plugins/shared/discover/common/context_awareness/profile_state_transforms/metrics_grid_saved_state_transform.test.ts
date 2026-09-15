@@ -63,4 +63,21 @@ describe('METRICS_GRID_SAVED_STATE_TRANSFORM', () => {
       searchTerm: '',
     });
   });
+
+  it('does not save hideExemplars, which is a per-tab display preference', () => {
+    // `hideExemplars` is deliberately omitted from `toSavedState`, matching how
+    // `sortField`/`sortDirection` are handled: it is a display preference scoped to the
+    // Discover tab, not part of a shared saved session.
+    //
+    // Do not "fix" this by adding the key. The saved object is validated by
+    // SCHEMA_TAB_TYPE_STATE_V16 in saved_search/server/saved_objects/schema.ts, which
+    // enumerates the allowed keys and rejects unknown ones, and the public API schema in
+    // kbn-as-code/discover-schema is zod `.strict()`. Emitting it without a saved-object
+    // model version bump and matching schema/converter updates fails validation at runtime.
+    const savedState = createRegistry().toSavedState(DiscoverTabType.Metrics, {
+      metricsState: { hideExemplars: true },
+    });
+
+    expect(savedState).not.toHaveProperty('hideExemplars');
+  });
 });

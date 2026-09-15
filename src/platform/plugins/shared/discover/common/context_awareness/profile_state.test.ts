@@ -19,8 +19,17 @@ import {
 import { METRICS_STATE_DEF } from './profile_state_definitions/metrics_grid_profile_state';
 import { METRICS_GRID_SAVED_STATE_TRANSFORM } from './profile_state_transforms/metrics_grid_saved_state_transform';
 
+/**
+ * The subset of grid settings written to a saved Discover session. This mirrors the
+ * explicit allowlist in `METRICS_GRID_SAVED_STATE_TRANSFORM` rather than spreading every
+ * default, so a new grid setting does not get silently assumed into saved state:
+ * `hideExemplars` is a per-tab display preference and is deliberately not saved.
+ */
 const createSavedMetricsSettings = (dimensions: string[]) => ({
-  ...METRICS_GRID_SETTINGS_DEFAULTS,
+  counterAggregation: METRICS_GRID_SETTINGS_DEFAULTS.counterAggregation,
+  gaugeAggregation: METRICS_GRID_SETTINGS_DEFAULTS.gaugeAggregation,
+  histogramPercentile: METRICS_GRID_SETTINGS_DEFAULTS.histogramPercentile,
+  searchTerm: METRICS_GRID_SETTINGS_DEFAULTS.searchTerm,
   dimensions,
 });
 

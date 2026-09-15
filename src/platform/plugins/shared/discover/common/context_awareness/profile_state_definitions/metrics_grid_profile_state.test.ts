@@ -37,6 +37,7 @@ describe('METRICS_STATE_DEF', () => {
       counterAggregation: { type: ProfileStateType.Url },
       gaugeAggregation: { type: ProfileStateType.Url },
       histogramPercentile: { type: ProfileStateType.Url },
+      hideExemplars: { type: ProfileStateType.Url },
       sortField: { type: ProfileStateType.Url },
       sortDirection: { type: ProfileStateType.Url },
       dimensions: { type: ProfileStateType.Url },
@@ -58,6 +59,7 @@ describe('METRICS_STATE_DEF', () => {
       counterAggregation: 'max',
       gaugeAggregation: 'avg',
       histogramPercentile: 'p95',
+      hideExemplars: false,
       sortField: 'alphabetically',
       sortDirection: 'asc',
       dimensions: [],
@@ -95,6 +97,32 @@ describe('METRICS_STATE_DEF', () => {
     });
 
     expect(stripped).toEqual({ [KEY]: { counterAggregation: 'max' } });
+  });
+
+  it('preserves a hidden-exemplars selection so it reaches the URL', () => {
+    const registry = createRegistry();
+
+    const stripped = registry.pickStateByType({
+      profileStateMap: { [KEY]: { hideExemplars: true } },
+      stateTypes: [ProfileStateType.Url],
+      defaultsHandling: 'strip',
+    });
+
+    expect(stripped).toEqual({ [KEY]: { hideExemplars: true } });
+  });
+
+  it('strips the default shown-exemplars value so it never reaches the URL', () => {
+    const registry = createRegistry();
+
+    // This is why the setting is keyed negatively: the common case (exemplars shown)
+    // is the default, so it is stripped and a shared link stays clean.
+    const stripped = registry.pickStateByType({
+      profileStateMap: { [KEY]: { hideExemplars: false } },
+      stateTypes: [ProfileStateType.Url],
+      defaultsHandling: 'strip',
+    });
+
+    expect(stripped[KEY]).toBeUndefined();
   });
 
   it('preserves a non-default sort so it reaches the URL', () => {
