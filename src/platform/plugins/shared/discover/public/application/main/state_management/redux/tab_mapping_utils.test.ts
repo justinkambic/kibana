@@ -834,11 +834,24 @@ describe('tab mapping utils', () => {
   describe('tab type persistence', () => {
     const profileStateRegistry = createProfileStateRegistry();
     const tabTypeServices = { ...services, profileStateRegistry };
+    /**
+     * The grid settings written to a saved Discover session. This mirrors the explicit
+     * allowlist in `METRICS_GRID_SAVED_STATE_TRANSFORM` rather than spreading every grid
+     * setting, so a new setting is not silently assumed into saved state: `hideExemplars` is
+     * a per-tab display preference and is deliberately not saved.
+     */
+    const SAVED_METRICS_SETTINGS = {
+      counterAggregation: METRICS_GRID_SETTINGS_DEFAULTS.counterAggregation,
+      gaugeAggregation: METRICS_GRID_SETTINGS_DEFAULTS.gaugeAggregation,
+      histogramPercentile: METRICS_GRID_SETTINGS_DEFAULTS.histogramPercentile,
+      searchTerm: METRICS_GRID_SETTINGS_DEFAULTS.searchTerm,
+    };
+
     const createMetricsTabTypeState = (
       dimensions: string[]
     ): NonNullable<DiscoverSessionTab['tabTypeState']> => ({
       type: DiscoverTabType.Metrics,
-      ...METRICS_GRID_SETTINGS_DEFAULTS,
+      ...SAVED_METRICS_SETTINGS,
       dimensions,
     });
 
@@ -857,9 +870,11 @@ describe('tab mapping utils', () => {
       });
 
       expect(tabState.initialInternalState?.tabType).toBe(DiscoverTabType.Metrics);
+      // Hydration restores exactly what was saved. `hideExemplars` is absent because it is
+      // not saved; it resolves to its default when the state is read.
       expect(tabState.profileState).toEqual({
         metricsState: {
-          ...METRICS_GRID_SETTINGS_DEFAULTS,
+          ...SAVED_METRICS_SETTINGS,
           dimensions: ['host.name'],
         },
       });
