@@ -21,6 +21,11 @@ globalSetupHook('Setup metrics experience tests data', async ({ esClient, apiSer
     'feature_flags.overrides': {
       'discover.metricsExperienceEditGridSettingsEnabled': true,
       'discover.metricsExperienceSortEnabled': true,
+      // NOTE: this enables exemplars for the entire parallel suite, not just the grid
+      // settings spec. That is harmless while nothing consumes the flag, but once the
+      // exemplars fetch layer lands it will switch exemplar fetching on for every
+      // metrics-experience spec. Re-evaluate the scope of this override at that point.
+      'observability.metricsExemplarsEnabled': true,
     },
   });
 

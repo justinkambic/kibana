@@ -220,6 +220,73 @@ spaceTest.describe(
       });
     });
 
+    spaceTest(
+      'shows the exemplars control when the exemplars flag is enabled',
+      async ({ pageObjects }) => {
+        const { gridSettings } = pageObjects.metricsExperience;
+
+        await gridSettings.open();
+
+        await expect(gridSettings.exemplarsSwitch).toBeVisible();
+        // "Show exemplars" is checked by default: `hideExemplars` defaults to false.
+        await expect(gridSettings.exemplarsSwitch).toBeChecked();
+      }
+    );
+
+    spaceTest(
+      'persists a hidden-exemplars selection in the URL and across a reload',
+      async ({ pageObjects, page }) => {
+        const { metricsExperience } = pageObjects;
+        const { gridSettings } = metricsExperience;
+
+        await spaceTest.step(
+          'a fresh session carries no exemplars setting in the URL',
+          async () => {
+            expect(metricsExperience.getProfileState(page.url())).not.toContain('hideExemplars');
+          }
+        );
+
+        await spaceTest.step('turning the switch off writes it to the URL', async () => {
+          await gridSettings.toggleExemplars();
+          await expect(gridSettings.exemplarsSwitch).not.toBeChecked();
+          await gridSettings.apply();
+          // The URL is written through `kbnUrlControls`, which batches asynchronously and so
+          // is not settled by the time the flyout has closed. Rison encodes `true` as `!t`.
+          await expect
+            .poll(() => metricsExperience.getProfileState(page.url()))
+            .toContain('hideExemplars:!t');
+        });
+
+        await spaceTest.step('wait for the setting to persist to local storage', async () => {
+          // Tab state is written on a 300ms trailing throttle, so wait for it to land before
+          // reloading -- otherwise the reload can race ahead and read back the default.
+          await expect
+            .poll(() => metricsExperience.getPersistedMetricsStateField('hideExemplars'))
+            .toBe(true);
+        });
+
+        await spaceTest.step('reload and verify the selection persisted', async () => {
+          await page.reload();
+          // The grid only mounts once the post-reload metrics fetch resolves, and a cold
+          // Discover re-init plus that fetch regularly exceeds the default 10s on serverless CI
+          // (matching `waitForDiscoverPage`'s own 30s allowance for the same reason).
+          await expect(metricsExperience.grid).toBeVisible({ timeout: 30_000 });
+
+          await gridSettings.open();
+          await expect(gridSettings.exemplarsSwitch).not.toBeChecked();
+        });
+
+        await spaceTest.step('restoring the default strips it from the URL', async () => {
+          await gridSettings.toggleExemplars();
+          await expect(gridSettings.exemplarsSwitch).toBeChecked();
+          await gridSettings.apply();
+          await expect
+            .poll(() => metricsExperience.getProfileState(page.url()))
+            .not.toContain('hideExemplars');
+        });
+      }
+    );
+
     spaceTest('applies a grid setting supplied by the URL', async ({ pageObjects, page }) => {
       const { metricsExperience } = pageObjects;
       const { gridSettings } = metricsExperience;

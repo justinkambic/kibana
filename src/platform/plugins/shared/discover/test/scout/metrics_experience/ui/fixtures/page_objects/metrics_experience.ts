@@ -240,14 +240,15 @@ export class MetricsExperiencePage {
       | 'counterAggregation'
       | 'gaugeAggregation'
       | 'histogramPercentile'
-  ): Promise<string | undefined> {
+      | 'hideExemplars'
+  ): Promise<string | boolean | undefined> {
     return this.page.evaluate(
       ([storageKey, fieldName]) => {
         const raw = window.localStorage.getItem(storageKey);
         if (!raw) return undefined;
         const { openTabs } = JSON.parse(raw) as {
           openTabs?: Array<{
-            profileState?: { metricsState?: Record<string, string> };
+            profileState?: { metricsState?: Record<string, string | boolean> };
           }>;
         };
         return openTabs?.find((tab) => tab.profileState?.metricsState?.[fieldName] != null)

@@ -18,6 +18,7 @@ globalTeardownHook(
       'feature_flags.overrides': {
         'discover.metricsExperienceEditGridSettingsEnabled': null,
         'discover.metricsExperienceSortEnabled': null,
+        'observability.metricsExemplarsEnabled': null,
       },
     });
 

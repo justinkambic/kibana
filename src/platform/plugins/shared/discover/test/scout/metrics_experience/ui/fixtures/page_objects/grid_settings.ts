@@ -18,9 +18,12 @@ export interface GridSettings {
   readonly counterSelect: Locator;
   readonly gaugeSelect: Locator;
   readonly histogramSelect: Locator;
+  readonly exemplarsSwitch: Locator;
   readonly applyButton: Locator;
   readonly cancelButton: Locator;
   readonly open: () => Promise<void>;
+  /** Opens the flyout and flips the exemplars switch; does not apply it. */
+  readonly toggleExemplars: () => Promise<void>;
   /** Opens the counter dropdown and clicks the given option; does not apply it. */
   readonly selectCounterAggregation: (option: SimpleAggregationOption) => Promise<void>;
   /** Opens the gauge dropdown and clicks the given option; does not apply it. */
@@ -39,6 +42,7 @@ export function createGridSettings(page: ScoutPage): GridSettings {
   const counterSelect = page.testSubj.locator('metricsExperienceGridSettingsCounterSelect');
   const gaugeSelect = page.testSubj.locator('metricsExperienceGridSettingsGaugeSelect');
   const histogramSelect = page.testSubj.locator('metricsExperienceGridSettingsHistogramSelect');
+  const exemplarsSwitch = page.testSubj.locator('metricsExperienceGridSettingsExemplarsSwitch');
   const applyButton = page.testSubj.locator('metricsExperienceGridSettingsApplyButton');
   const cancelButton = page.testSubj.locator('metricsExperienceGridSettingsCancelButton');
 
@@ -63,9 +67,14 @@ export function createGridSettings(page: ScoutPage): GridSettings {
     counterSelect,
     gaugeSelect,
     histogramSelect,
+    exemplarsSwitch,
     applyButton,
     cancelButton,
     open,
+    toggleExemplars: async () => {
+      await open();
+      await exemplarsSwitch.click();
+    },
     selectCounterAggregation: (option) =>
       selectFromDropdown(counterSelect, `metricsExperienceGridSettingsCounterOption-${option}`),
     selectGaugeAggregation: (option) =>
