@@ -29,19 +29,14 @@ import { withRestorableState } from '../../../restorable_state';
 import type { FlyoutState } from '../../../restorable_state';
 
 jest.mock('@kbn/discover-utils', () => {
-  const {
-    METRICS_GRID_HISTOGRAM_PERCENTILES,
-    METRICS_GRID_SETTINGS_DEFAULTS,
-    METRICS_GRID_SIMPLE_AGGREGATIONS,
-    METRICS_GRID_SORT_DEFAULTS,
-  } = jest.requireActual('@kbn/discover-utils/src/data_types/metrics');
+  const actualMetrics = jest.requireActual('@kbn/discover-utils/src/data_types/metrics');
 
   return {
     DiscoverFlyouts: { metricInsights: 'metricInsights' },
-    METRICS_GRID_HISTOGRAM_PERCENTILES,
-    METRICS_GRID_SETTINGS_DEFAULTS,
-    METRICS_GRID_SIMPLE_AGGREGATIONS,
-    METRICS_GRID_SORT_DEFAULTS,
+    METRICS_GRID_HISTOGRAM_PERCENTILES: actualMetrics.METRICS_GRID_HISTOGRAM_PERCENTILES,
+    METRICS_GRID_SETTINGS_DEFAULTS: actualMetrics.METRICS_GRID_SETTINGS_DEFAULTS,
+    METRICS_GRID_SIMPLE_AGGREGATIONS: actualMetrics.METRICS_GRID_SIMPLE_AGGREGATIONS,
+    METRICS_GRID_SORT_DEFAULTS: actualMetrics.METRICS_GRID_SORT_DEFAULTS,
     dismissAllFlyoutsExceptFor: jest.fn(),
   };
 });

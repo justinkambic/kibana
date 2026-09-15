@@ -23,12 +23,22 @@ import {
   EuiButtonEmpty,
   EuiAccordion,
   EuiIconTip,
+  EuiSwitch,
   useGeneratedHtmlId,
 } from '@elastic/eui';
 import { i18n } from '@kbn/i18n';
 import type { MetricsGridSettings } from '@kbn/discover-utils';
 import { useTelemetry } from '../../../context/ebt_telemetry_context';
-import { COUNTER_OPTIONS, GAUGE_OPTIONS, HISTOGRAM_OPTIONS } from './options';
+import { useFeatureFlag } from '../../../hooks';
+import { FEATURE_FLAGS, FEATURE_FLAG_DEFAULTS } from '../../../common/constants';
+import {
+  COUNTER_OPTIONS,
+  EXEMPLARS_GROUP_DESCRIPTION,
+  EXEMPLARS_GROUP_LABEL,
+  GAUGE_OPTIONS,
+  HISTOGRAM_OPTIONS,
+  SHOW_EXEMPLARS_LABEL,
+} from './options';
 import { getAggregationConfigChanges } from './get_aggregation_config_changes';
 import { getChangedSettings } from './get_changed_settings';
 
@@ -48,6 +58,14 @@ export const GridSettingsFlyout = ({
   const aggregationAccordionId = useGeneratedHtmlId({
     prefix: 'metricsGridSettingsAggregationAccordion',
   });
+  const exemplarsAccordionId = useGeneratedHtmlId({
+    prefix: 'metricsGridSettingsExemplarsAccordion',
+  });
+
+  const isExemplarsEnabled = useFeatureFlag(
+    FEATURE_FLAGS.IS_EXEMPLARS_ENABLED,
+    FEATURE_FLAG_DEFAULTS[FEATURE_FLAGS.IS_EXEMPLARS_ENABLED]
+  );
 
   const aggregationGroupDescription = i18n.translate(
     'metricsExperience.gridSettingsFlyout.aggregationGroupDescription',
@@ -165,6 +183,44 @@ export const GridSettingsFlyout = ({
             />
           </EuiFormRow>
         </EuiAccordion>
+        {isExemplarsEnabled && (
+          <>
+            <EuiSpacer size="m" />
+            <EuiAccordion
+              id={exemplarsAccordionId}
+              initialIsOpen
+              data-test-subj="metricsExperienceGridSettingsExemplarsAccordion"
+              buttonContent={
+                <EuiFlexGroup gutterSize="xs" alignItems="center" responsive={false}>
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size="xs">
+                      <h5>{EXEMPLARS_GROUP_LABEL}</h5>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiIconTip
+                      type="info"
+                      color="subdued"
+                      aria-label={EXEMPLARS_GROUP_DESCRIPTION}
+                      content={EXEMPLARS_GROUP_DESCRIPTION}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              }
+            >
+              <EuiSpacer size="m" />
+              <EuiSwitch
+                data-test-subj="metricsExperienceGridSettingsExemplarsSwitch"
+                label={SHOW_EXEMPLARS_LABEL}
+                // The switch is affirmative ("Show exemplars") while the stored setting is
+                // negative, so that its default strips out of the URL and local tab storage.
+                // That trade-off is paid for by this single inversion.
+                checked={!draftSettings.hideExemplars}
+                onChange={(event) => onSettingChange('hideExemplars', !event.target.checked)}
+              />
+            </EuiAccordion>
+          </>
+        )}
       </EuiFlyoutBody>
       <EuiFlyoutFooter>
         <EuiFlexGroup justifyContent="spaceBetween">

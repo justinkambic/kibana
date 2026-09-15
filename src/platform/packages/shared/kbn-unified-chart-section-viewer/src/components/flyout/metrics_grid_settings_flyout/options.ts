@@ -52,6 +52,31 @@ export const HISTOGRAM_PERCENTILE_LABELS: Record<HistogramPercentile, string> = 
   }),
 };
 
+/** Header label for the exemplars section of the grid configuration flyout. */
+export const EXEMPLARS_GROUP_LABEL = i18n.translate(
+  'metricsExperience.gridSettingsFlyout.exemplarsGroupLabel',
+  { defaultMessage: 'Exemplars' }
+);
+
+/** Tooltip copy explaining what exemplars are and the scope of the setting. */
+export const EXEMPLARS_GROUP_DESCRIPTION = i18n.translate(
+  'metricsExperience.gridSettingsFlyout.exemplarsGroupDescription',
+  {
+    defaultMessage:
+      'Exemplars are sample data points that link a metric to a trace recorded at the same time. Changes apply to every metric in this Discover tab.',
+  }
+);
+
+/**
+ * Label for the exemplars switch. Phrased affirmatively so that a checked switch means
+ * "on"; the underlying `hideExemplars` setting stays negative so its default strips out
+ * of persisted state, which is why the control inverts the value.
+ */
+export const SHOW_EXEMPLARS_LABEL = i18n.translate(
+  'metricsExperience.gridSettingsFlyout.showExemplarsLabel',
+  { defaultMessage: 'Show exemplars' }
+);
+
 export const buildSimpleAggregationOptions = (
   dataTestSubjPrefix: string
 ): Array<EuiSuperSelectOption<SimpleAggregation>> =>
