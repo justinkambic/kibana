@@ -14,10 +14,43 @@ jobs:
         contains(fromJSON('["MEMBER","OWNER"]'), github.event.comment.author_association)
         || github.event.comment.user.login == 'kibanamachine'
       )
-      && startsWith(github.event.comment.body, '/flaky ')
+      && contains(github.event.comment.body, '/flaky ')
     runs-on: ubuntu-latest
     steps:
+      - name: Parse /flaky command
+        id: parse
+        env:
+          COMMENT_BODY: ${{github.event.comment.body}}
+        run: |
+          # Ignore leading whitespace and blank lines, so a comment that starts with
+          # a space or newline is still treated as a command.
+          body="${COMMENT_BODY#"${COMMENT_BODY%%[![:space:]]*}"}"
+
+          # The job-level `if` only checks that `/flaky ` appears somewhere in the
+          # comment. Comments that merely mention it further down are not commands.
+          if [[ "$body" != "/flaky "* ]]; then
+            echo "Comment does not start with /flaky, skipping."
+            exit 0
+          fi
+
+          # Match `/flaky` and capture only the config list. Tokens are
+          # `type:path[:count]` and never span lines, so the match stops before any
+          # footer, markers, trailing CR, or prose the comment carries below the
+          # command — validating and extracting the configs in one step.
+          # Pattern: type:path[:count] where path cannot contain .., start with ./ or /, or end with /
+          config_token='(ftrConfig|scoutConfig|config):[a-zA-Z0-9_-]+([/.][a-zA-Z0-9_-]+)*(:[0-9]+)?'
+          if [[ ! "$body" =~ ^/flaky[[:blank:]]+(${config_token}([[:blank:]]+${config_token})*) ]]; then
+            echo "::error::Invalid comment format. Use: /flaky <type>:<config>[:count] [<type>:<config>[:count] ...]"
+            echo "::error::Where <type> is one of: ftrConfig, scoutConfig, config"
+            echo "::error::And <count> is an optional positive integer"
+            echo "::error::Path cannot contain .., start with ./ or /, or end with /"
+            echo "::error::Example: /flaky config:x-pack/test:5 ftrConfig:functional/apps"
+            exit 1
+          fi
+          echo "configs=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+
       - name: Checkout kibana-operations
+        if: steps.parse.outputs.configs != ''
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: 'elastic/kibana-operations'
@@ -27,28 +60,13 @@ jobs:
           persist-credentials: false
 
       - name: Trigger flaky test runner
+        if: steps.parse.outputs.configs != ''
         working-directory: ./kibana-operations/triage
         env:
           GITHUB_TOKEN: ${{secrets.KIBANAMACHINE_TOKEN}}
           BUILDKITE_TOKEN: ${{secrets.OPS_BUILDKITE_TOKEN}}
-          COMMENT_BODY: ${{github.event.comment.body}}
+          CONFIGS: ${{steps.parse.outputs.configs}}
           ISSUE_NUMBER: ${{github.event.issue.number}}
         run: |
-          # Match `/flaky` and capture only the config list. Tokens are
-          # `type:path[:count]` and never span lines, so the match stops before any
-          # footer, markers, trailing CR, or prose the comment carries below the
-          # command — validating and extracting the configs in one step.
-          # Pattern: type:path[:count] where path cannot contain .., start with ./ or /, or end with /
-          config_token='(ftrConfig|scoutConfig|config):[a-zA-Z0-9_-]+([/.][a-zA-Z0-9_-]+)*(:[0-9]+)?'
-          if [[ ! "$COMMENT_BODY" =~ ^/flaky[[:blank:]]+(${config_token}([[:blank:]]+${config_token})*) ]]; then
-            echo "::error::Invalid comment format. Use: /flaky <type>:<config>[:count] [<type>:<config>[:count] ...]"
-            echo "::error::Where <type> is one of: ftrConfig, scoutConfig, config"
-            echo "::error::And <count> is an optional positive integer"
-            echo "::error::Path cannot contain .., start with ./ or /, or end with /"
-            echo "::error::Example: /flaky config:x-pack/test:5 ftrConfig:functional/apps"
-            exit 1
-          fi
-          configs="${BASH_REMATCH[1]}"
-
           npm ci --omit=dev
-          node trigger-flaky-test-runner $ISSUE_NUMBER "$configs"
+          node trigger-flaky-test-runner $ISSUE_NUMBER "$CONFIGS"
